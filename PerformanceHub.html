@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Hub — Nour</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<style>
+:root {
+  --black: #080A0C;
+  --white: #F2EFE8;
+  --accent: #C8F03C;
+  --muted: #4A4F55;
+  --card: #0F1215;
+  --border: #1E2328;
+  --squash: #C8F03C;
+  --gym: #FF4D1C;
+  --run: #3CB4FF;
+  --recovery: #FF9F43;
+  --tournament: #FFD600;
+  --purple: #B87EFF;
+  --surface: #12161A;
+  --surface2: #181D22;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* TOP NAV */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(8,10,12,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;padding:0 24px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);margin-right:32px;white-space:nowrap;padding:16px 0;}
+.nav-tabs{display:flex;gap:0;overflow-x:auto;flex:1;-ms-overflow-style:none;scrollbar-width:none;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{padding:18px 16px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Mono',monospace;}
+.nav-tab:hover{color:var(--white);}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.export-btn{margin-left:auto;padding:8px 16px;font-size:8px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;border-radius:2px;transition:all .2s;white-space:nowrap;}
+.export-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* PANELS */
+.panel{display:none;animation:fadeIn .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* COMMON */
+.page-header{padding:40px 32px 28px;border-bottom:1px solid var(--border);}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);line-height:.9;letter-spacing:2px;}
+.page-title span{color:var(--accent);}
+.page-sub{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:10px;}
+.section{padding:28px 32px;border-bottom:1px solid var(--border);}
+.section:last-child{border-bottom:none;}
+.sec-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;}
+.card-grid{display:grid;gap:16px;}
+.card-grid-2{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));}
+.card-grid-3{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+.card-grid-4{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}
+.stat-big{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--accent);line-height:1;}
+.stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.btn{padding:9px 18px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Mono',monospace;border-radius:2px;transition:all .2s;border:1px solid;}
+.btn-primary{background:var(--accent);color:var(--black);border-color:var(--accent);}
+.btn-primary:hover{background:var(--white);border-color:var(--white);}
+.btn-ghost{background:none;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{color:var(--white);border-color:var(--white);}
+.btn-danger{background:none;color:var(--gym);border-color:var(--gym);}
+.btn-danger:hover{background:rgba(255,77,28,.1);}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;border-radius:2px;outline:none;transition:border-color .2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+select option{background:var(--surface2);}
+label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
+.form-row{display:grid;gap:14px;margin-bottom:14px;}
+.form-row-2{grid-template-columns:1fr 1fr;}
+.form-row-3{grid-template-columns:1fr 1fr 1fr;}
+.form-row-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:2px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;}
+.dot{width:5px;height:5px;border-radius:50%;display:inline-block;}
+.badge{display:inline-block;padding:3px 8px;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;}
+.badge-win{background:rgba(200,240,60,.12);color:var(--accent);}
+.badge-loss{background:rgba(255,77,28,.12);color:var(--gym);}
+.table{width:100%;border-collapse:collapse;font-size:10px;}
+.table th{text-align:left;padding:9px 14px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);font-weight:400;}
+.table td{padding:11px 14px;border-bottom:1px solid var(--border);color:#8A9099;vertical-align:middle;}
+.table tr:hover td{background:rgba(255,255,255,.02);color:var(--white);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:10px;letter-spacing:1px;}
+.empty-state .icon{font-size:32px;margin-bottom:12px;opacity:.3;}
+.chart-wrap{position:relative;height:220px;}
+.chart-wrap-lg{position:relative;height:300px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+.close-modal{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+.progress-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.color-squash{color:var(--squash);}
+.color-gym{color:var(--gym);}
+.color-run{color:var(--run);}
+.color-recovery{color:var(--recovery);}
+.color-tournament{color:var(--tournament);}
+.color-accent{color:var(--accent);}
+.metric-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.metric-row:last-child{border-bottom:none;}
+.metric-name{font-size:10px;color:#8A9099;}
+.metric-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);}
+
+/* ═══════════════════════════════════
+   TAB 1 — TRAINING SCHEDULE
+════════════════════════════════════ */
+.week-header{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--border);border-bottom:none;border-radius:4px 4px 0 0;overflow:hidden;}
+.day-head{padding:14px;border-right:1px solid var(--border);text-align:center;}
+.day-head:last-child{border-right:none;}
+.day-name-big{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+.day-name-sub{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--border);border-radius:0 0 4px 4px;min-height:360px;}
+.day-col{border-right:1px solid var(--border);padding:8px;min-height:360px;display:flex;flex-direction:column;gap:6px;position:relative;}
+.day-col:last-child{border-right:none;}
+.day-col.drag-over{background:rgba(200,240,60,.04);}
+.session-block{border-radius:3px;padding:8px 9px;cursor:grab;position:relative;overflow:hidden;font-size:9px;transition:opacity .2s,transform .2s;}
+.session-block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;}
+.session-block:active{cursor:grabbing;opacity:.7;}
+.session-block.type-squash{background:rgba(200,240,60,.06);}.session-block.type-squash::before{background:var(--squash);}
+.session-block.type-gym{background:rgba(255,77,28,.06);}.session-block.type-gym::before{background:var(--gym);}
+.session-block.type-running{background:rgba(60,180,255,.06);}.session-block.type-running::before{background:var(--run);}
+.session-block.type-recovery{background:rgba(255,159,67,.06);}.session-block.type-recovery::before{background:var(--recovery);}
+.session-block.type-tournament{background:rgba(255,214,0,.06);}.session-block.type-tournament::before{background:var(--tournament);}
+.sb-type{font-size:7px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;font-weight:500;}
+.type-squash .sb-type{color:var(--squash);}
+.type-gym .sb-type{color:var(--gym);}
+.type-running .sb-type{color:var(--run);}
+.type-recovery .sb-type{color:var(--recovery);}
+.type-tournament .sb-type{color:var(--tournament);}
+.sb-title{font-family:'Instrument Serif',serif;font-size:11px;line-height:1.3;margin-bottom:2px;}
+.sb-meta{font-size:7px;color:var(--muted);}
+.sb-actions{display:none;position:absolute;top:4px;right:4px;gap:3px;}
+.session-block:hover .sb-actions{display:flex;}
+.sb-btn{width:18px;height:18px;border-radius:2px;border:none;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);}
+.sb-btn-edit{color:var(--accent);}
+.sb-btn-del{color:var(--gym);}
+.add-session-btn{border:1px dashed var(--border);background:none;color:var(--muted);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:8px;cursor:pointer;border-radius:3px;width:100%;font-family:'DM Mono',monospace;transition:all .2s;margin-top:auto;}
+.add-session-btn:hover{border-color:var(--accent);color:var(--accent);}
+.weekly-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.sum-card{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:16px;text-align:center;}
+.sum-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;}
+.sum-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+/* ═══════════════════════════════════
+   TAB 2 — RUNNING
+════════════════════════════════════ */
+.run-type-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.run-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;border-top:2px solid var(--run);}
+.run-type-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--run);margin-bottom:8px;}
+.run-distance-big{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--white);line-height:1;}
+.run-distance-big span{font-size:20px;color:var(--muted);}
+.run-progression{font-size:9px;color:var(--muted);margin-top:4px;}
+.run-log-btn{margin-top:16px;width:100%;}
+.pb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pb-dot{width:6px;height:6px;border-radius:50%;background:var(--run);}
+
+/* ═══════════════════════════════════
+   TAB 3 — NUTRITION & HYDRATION
+════════════════════════════════════ */
+.hydration-hero{text-align:center;padding:32px;}
+.water-amount{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--run);line-height:1;}
+.water-goal{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+.quick-add-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.quick-add-btn{padding:14px;text-align:center;background:rgba(60,180,255,.06);border:1px solid rgba(60,180,255,.15);color:var(--run);cursor:pointer;border-radius:3px;font-family:'Bebas Neue',sans-serif;font-size:22px;transition:all .2s;}
+.quick-add-btn:hover{background:rgba(60,180,255,.12);transform:scale(1.02);}
+.quick-add-btn span{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.streak-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,240,60,.06);border:1px solid rgba(200,240,60,.15);border-radius:3px;padding:8px 14px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);}
+
+.macro-goal-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.macro-goal-strip>div{flex:1;min-width:110px;}
+.macro-ring-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.macro-ring-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px;text-align:center;}
+.macro-ring-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.macro-ring-val{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;}
+.macro-ring-val span{font-size:13px;color:var(--muted);}
+.macro-bar-track{height:5px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden;}
+.macro-bar-fill{height:100%;border-radius:3px;transition:width .3s;}
+.meal-type-badge{display:inline-block;padding:3px 8px;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;background:rgba(200,240,60,.1);color:var(--accent);}
+.recipe-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px;display:flex;flex-direction:column;gap:10px;}
+.recipe-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;}
+.recipe-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.recipe-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.recipe-macro-item{text-align:center;}
+.recipe-macro-val{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white);}
+.recipe-macro-lbl{font-size:6.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.recipe-ingredients{font-size:9px;color:var(--muted);line-height:1.7;white-space:pre-line;}
+.recipe-actions{display:flex;gap:8px;margin-top:auto;}
+.recipe-actions .btn{flex:1;font-size:8px;padding:8px 10px;}
+.tag-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.tag-filter-btn{padding:6px 12px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:20px;font-family:'DM Mono',monospace;transition:all .2s;}
+.tag-filter-btn:hover{color:var(--white);border-color:var(--white);}
+.tag-filter-btn.active{color:var(--black);background:var(--accent);border-color:var(--accent);}
+
+/* ═══════════════════════════════════
+   TAB 4 — INCOME
+════════════════════════════════════ */
+.income-sources{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.income-source-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px;}
+.income-amount{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--white);line-height:1;}
+.income-cat{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.cat-dot-sponsor{background:#FFD600;}
+.cat-dot-coaching{background:var(--accent);}
+.cat-dot-business{background:var(--run);}
+.cat-dot-other{background:var(--purple);}
+
+/* ═══════════════════════════════════
+   TAB 5 — TOURNAMENTS
+════════════════════════════════════ */
+.tournament-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;border-left:3px solid var(--tournament);}
+.t-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+.t-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;}
+.t-meta-item{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.t-meta-item .icon{font-size:10px;}
+.countdown{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--tournament);line-height:1;}
+.countdown-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.status-pill{display:inline-block;padding:3px 8px;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;}
+.status-confirmed{background:rgba(200,240,60,.1);color:var(--accent);}
+.status-pending{background:rgba(255,159,67,.1);color:var(--recovery);}
+.status-not-started{background:rgba(74,79,85,.2);color:var(--muted);}
+
+/* ═══════════════════════════════════
+   TAB 6 — MATCH LOG
+════════════════════════════════════ */
+.match-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px;cursor:pointer;transition:border-color .2s;}
+.match-card:hover{border-color:var(--muted);}
+.match-card.win{border-left:3px solid var(--accent);}
+.match-card.loss{border-left:3px solid var(--gym);}
+.match-score{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;}
+.match-opponent{font-size:11px;color:var(--white);margin-top:4px;}
+.match-meta{font-size:9px;color:var(--muted);margin-top:6px;}
+.win-circle{width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.win-pct{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);line-height:1;}
+.win-lbl{font-size:6px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+
+/* ═══════════════════════════════════
+   TAB 6b — DRILL LIBRARY
+════════════════════════════════════ */
+.drill-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;display:flex;flex-direction:column;gap:10px;}
+.drill-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;}
+.drill-meta{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.drill-steps{list-style:none;counter-reset:step;font-size:10px;color:#C7CBD1;line-height:1.9;}
+.drill-steps li{counter-increment:step;padding-left:22px;position:relative;}
+.drill-steps li::before{content:counter(step);position:absolute;left:0;top:1px;width:15px;height:15px;border-radius:50%;background:rgba(200,240,60,.12);color:var(--accent);font-size:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;}
+.drill-notes{font-size:9px;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:8px;}
+.drill-actions{display:flex;gap:8px;margin-top:auto;}
+.drill-actions .btn{flex:1;font-size:8px;padding:8px 10px;}
+#nutDateInput{width:auto;min-width:150px;}
+
+/* ═══════════════════════════════════
+   TAB 7 — JOURNAL
+════════════════════════════════════ */
+.journal-entry{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px;cursor:pointer;transition:border-color .2s;}
+.journal-entry:hover{border-color:var(--muted);}
+.journal-date{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+.journal-entry-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;color:var(--white);margin-top:2px;}
+.journal-preview{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-family:'Instrument Serif',serif;font-size:13px;line-height:1.6;}
+.journal-tmpl-chip{display:inline-block;margin-top:10px;padding:3px 8px;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;background:rgba(184,126,255,.1);color:var(--purple);}
+.rating-display{display:flex;gap:2px;}
+.rating-pip{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.rating-pip.filled{background:var(--accent);}
+
+/* Journal write view */
+.journal-write-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.template-row{display:flex;gap:8px;flex-wrap:wrap;padding:18px 18px 0;}
+.template-chip{padding:8px 14px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:20px;font-family:'DM Mono',monospace;transition:all .2s;}
+.template-chip:hover{color:var(--white);border-color:var(--white);}
+.template-chip.active{color:var(--black);background:var(--purple);border-color:var(--purple);}
+.journal-title-input{background:none;border:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--white);padding:20px 18px 0;width:100%;outline:none;}
+.journal-title-input::placeholder{color:var(--muted);}
+.journal-meta-row{display:flex;gap:14px;align-items:center;padding:10px 18px;flex-wrap:wrap;}
+.journal-editor{width:100%;min-height:340px;background:none;border:none;color:var(--white);font-family:'Instrument Serif',serif;font-size:17px;line-height:1.85;padding:14px 18px 24px;resize:vertical;outline:none;}
+.journal-editor::placeholder{color:var(--muted);font-style:italic;}
+.journal-footer-row{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+.mini-slider-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 18px 18px;}
+.mini-slider-item label{margin-bottom:8px;}
+.journal-view-body{font-family:'Instrument Serif',serif;font-size:17px;line-height:1.85;white-space:pre-wrap;color:var(--white);}
+.slider-wrap{display:flex;align-items:center;gap:10px;}
+input[type=range]{-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;padding:0;border:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;}
+.slider-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);min-width:28px;text-align:right;}
+.search-input-wrap{position:relative;}
+.search-input-wrap input{padding-left:36px;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;}
+
+/* ═══════════════════════════════════
+   TAB 8 — ANALYTICS
+════════════════════════════════════ */
+.analytics-kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;}
+.kpi-icon{font-size:20px;margin-bottom:10px;}
+.kpi-val{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--white);line-height:1;}
+.kpi-unit{font-size:16px;color:var(--muted);}
+.kpi-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.kpi-trend{font-size:9px;margin-top:6px;}
+.kpi-trend.up{color:var(--accent);}
+.kpi-trend.down{color:var(--gym);}
+.analytics-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:900px){.analytics-charts{grid-template-columns:1fr;}}
+
+@media(max-width:768px){
+  .topbar{padding:0 16px;}
+  .logo{font-size:18px;margin-right:16px;}
+  .page-header{padding:24px 16px 20px;}
+  .section{padding:20px 16px;}
+  .week-header,.week-grid{grid-template-columns:1fr;}
+  .day-col{min-height:auto;}
+  .form-row-2,.form-row-3,.form-row-4{grid-template-columns:1fr;}
+  .quick-add-grid{grid-template-columns:repeat(2,1fr);}
+  .analytics-kpi{grid-template-columns:1fr 1fr;}
+  .macro-ring-grid{grid-template-columns:1fr 1fr;}
+  .mini-slider-grid{grid-template-columns:1fr 1fr;}
+  .macro-goal-strip{flex-direction:column;}
+}
+@media(max-width:480px){
+  .analytics-kpi{grid-template-columns:1fr;}
+  .weekly-summary{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topbar">
+  <div class="logo">PERF<span style="color:var(--white)">HUB</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('schedule')">Training</button>
+    <button class="nav-tab" onclick="showTab('running')">Running</button>
+    <button class="nav-tab" onclick="showTab('nutrition')">Nutrition</button>
+    <button class="nav-tab" onclick="showTab('income')">Income</button>
+    <button class="nav-tab" onclick="showTab('tournaments')">Tournaments</button>
+    <button class="nav-tab" onclick="showTab('matches')">Matches</button>
+    <button class="nav-tab" onclick="showTab('drills')">Drills</button>
+    <button class="nav-tab" onclick="showTab('journal')">Journal</button>
+    <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+  </div>
+  <button class="export-btn" onclick="exportCSV()">↓ Export CSV</button>
+</nav>
+
+<!-- ═══ TAB 1: TRAINING SCHEDULE ═══ -->
+<div class="panel active" id="panel-schedule">
+  <div class="page-header">
+    <div class="page-title">TRAINING <span>SCHEDULE</span></div>
+    <div class="page-sub">Drag to move · Click to edit · Week of <span id="weekLabel"></span></div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div class="sec-label" style="margin-bottom:0;">Week at a Glance</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="tag" style="background:rgba(200,240,60,.08);color:var(--squash)"><span class="dot" style="background:var(--squash)"></span>Squash</span>
+        <span class="tag" style="background:rgba(255,77,28,.08);color:var(--gym)"><span class="dot" style="background:var(--gym)"></span>Gym</span>
+        <span class="tag" style="background:rgba(60,180,255,.08);color:var(--run)"><span class="dot" style="background:var(--run)"></span>Running</span>
+        <span class="tag" style="background:rgba(255,159,67,.08);color:var(--recovery)"><span class="dot" style="background:var(--recovery)"></span>Recovery</span>
+        <span class="tag" style="background:rgba(255,214,0,.08);color:var(--tournament)"><span class="dot" style="background:var(--tournament)"></span>Tournament</span>
+      </div>
+    </div>
+
+    <div class="week-header" id="weekHeader"></div>
+    <div class="week-grid" id="weekGrid"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Weekly Summary</div>
+    <div class="weekly-summary">
+      <div class="sum-card">
+        <div class="sum-val" id="totalHours">0<span style="font-size:20px;color:var(--muted)">h</span></div>
+        <div class="sum-lbl">Training Hours</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-val" id="totalSessions">0</div>
+        <div class="sum-lbl">Total Sessions</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-val" id="totalRunKm">0<span style="font-size:20px;color:var(--muted)">km</span></div>
+        <div class="sum-lbl">Running Volume</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 2: RUNNING ═══ -->
+<div class="panel" id="panel-running">
+  <div class="page-header">
+    <div class="page-title">RUNNING <span>PROGRESS</span></div>
+    <div class="page-sub">Strava-style tracking · Auto-progression · Injury prevention</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Target Distances — Week <span id="runWeekNum">1</span></div>
+    <div class="run-type-cards" id="runTypeCards"></div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Log a Run</div>
+    </div>
+    <div class="card">
+      <div class="form-row form-row-2">
+        <div>
+          <label>Run Type</label>
+          <select id="runType">
+            <option value="easy">Easy Run</option>
+            <option value="tempo">Tempo Run</option>
+            <option value="norwegian">Norwegian 4×4</option>
+          </select>
+        </div>
+        <div>
+          <label>Date</label>
+          <input type="date" id="runDate">
+        </div>
+      </div>
+      <div class="form-row form-row-4">
+        <div>
+          <label>Distance (km)</label>
+          <input type="number" id="runDist" placeholder="6.0" step="0.1">
+        </div>
+        <div>
+          <label>Pace (min/km)</label>
+          <input type="text" id="runPace" placeholder="5:30">
+        </div>
+        <div>
+          <label>Avg HR (bpm)</label>
+          <input type="number" id="runHR" placeholder="145">
+        </div>
+        <div>
+          <label>RPE (1–10)</label>
+          <input type="number" id="runRPE" min="1" max="10" placeholder="7">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="logRun()">Log Run</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Personal Bests</div>
+    <div class="card-grid card-grid-3">
+      <div class="card" id="pbEasy">
+        <div class="run-type-label">Easy Run PB</div>
+        <div class="stat-big" style="color:var(--run)" id="pbEasyVal">—</div>
+        <div class="stat-label">Best distance logged</div>
+      </div>
+      <div class="card" id="pbTempo">
+        <div class="run-type-label">Tempo Run PB</div>
+        <div class="stat-big" style="color:var(--run)" id="pbTempoVal">—</div>
+        <div class="stat-label">Best distance logged</div>
+      </div>
+      <div class="card">
+        <div class="run-type-label">Best Pace PB</div>
+        <div class="stat-big" style="color:var(--run)" id="pbPaceVal">—</div>
+        <div class="stat-label">Min/km across all runs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card-grid" style="grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="sec-label">Weekly Volume (km)</div>
+        <div class="chart-wrap"><canvas id="runWeeklyChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Volume Over Time</div>
+        <div class="chart-wrap"><canvas id="runTrendChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Run History</div>
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Type</th><th>Distance</th><th>Pace</th><th>HR</th><th>RPE</th>
+          </tr>
+        </thead>
+        <tbody id="runHistoryBody">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No runs logged yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 3: NUTRITION & HYDRATION ═══ -->
+<div class="panel" id="panel-nutrition">
+  <div class="page-header">
+    <div class="page-title">NUTRITION <span>& HYDRATION</span></div>
+    <div class="page-sub">Per-day targets · Meal log · Recipes & meal preps · Water</div>
+  </div>
+
+  <!-- Day navigator + macros -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+      <div class="sec-label" style="margin-bottom:0;">Macros — <span id="nutDayLabel">Today</span></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="shiftNutDay(-1)">←</button>
+        <input type="date" id="nutDateInput" onchange="setNutDate(this.value)" style="width:auto;">
+        <button class="btn btn-ghost" onclick="shiftNutDay(1)">→</button>
+        <button class="btn btn-ghost" onclick="setNutDate(today())">Today</button>
+      </div>
+    </div>
+    <div id="nutSessionHint" style="font-size:9px;letter-spacing:.5px;color:var(--muted);margin-bottom:18px;"></div>
+
+    <div class="macro-ring-grid" id="macroRingGrid"></div>
+
+    <div style="margin-top:20px;">
+      <div class="sec-label" style="margin-bottom:10px;">Target for <span id="nutDayLabel2">Today</span> <span style="color:var(--muted);text-transform:none;letter-spacing:0;">— set this based on what you've got scheduled</span></div>
+      <div class="macro-goal-strip">
+        <div><label>Calories</label><input type="number" id="goalCals" onchange="updateNutGoals()"></div>
+        <div><label>Protein (g)</label><input type="number" id="goalProtein" onchange="updateNutGoals()"></div>
+        <div><label>Carbs (g)</label><input type="number" id="goalCarbs" onchange="updateNutGoals()"></div>
+        <div><label>Fat (g)</label><input type="number" id="goalFat" onchange="updateNutGoals()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log a meal -->
+  <div class="section">
+    <div class="sec-label">Log a Meal — <span id="nutDayLabel3">Today</span></div>
+    <div class="card">
+      <div class="form-row form-row-2">
+        <div>
+          <label>Meal</label>
+          <select id="mealType">
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="snack">Snack</option>
+          </select>
+        </div>
+        <div>
+          <label>What did you eat</label>
+          <input type="text" id="mealName" placeholder="e.g. Grilled chicken & rice">
+        </div>
+      </div>
+      <div class="form-row form-row-4">
+        <div><label>Calories</label><input type="number" id="mealCals" placeholder="0"></div>
+        <div><label>Protein (g)</label><input type="number" id="mealProtein" placeholder="0"></div>
+        <div><label>Carbs (g)</label><input type="number" id="mealCarbs" placeholder="0"></div>
+        <div><label>Fat (g)</label><input type="number" id="mealFat" placeholder="0"></div>
+      </div>
+      <button class="btn btn-primary" onclick="logMeal()">Add to Log</button>
+    </div>
+  </div>
+
+  <!-- Food log -->
+  <div class="section">
+    <div class="sec-label">Food Log — <span id="nutDayLabel4">Today</span></div>
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead><tr><th>Meal</th><th>Item</th><th>Cals</th><th>Protein</th><th>Carbs</th><th>Fat</th><th></th></tr></thead>
+        <tbody id="mealLogBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px;">No meals logged yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Weekly trend -->
+  <div class="section">
+    <div class="card-grid" style="grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="sec-label">Calories vs Target — Last 7 Days</div>
+        <div class="chart-wrap"><canvas id="nutWeekChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Macro Split — <span id="nutDayLabel5">Today</span></div>
+        <div class="chart-wrap"><canvas id="nutMacroChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hydration -->
+  <div class="section">
+    <div class="sec-label">Hydration</div>
+    <div class="hydration-hero">
+      <div class="water-amount"><span id="todayWater">0</span><span style="font-size:36px;color:var(--muted)">ml</span></div>
+      <div class="water-goal">Goal: <span id="hydGoalDisplay">3500</span>ml &nbsp;·&nbsp; <span id="hydPctDisplay">0%</span> complete</div>
+      <div style="margin:16px auto;max-width:400px;">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="hydProgressBar" style="width:0%;background:var(--run)"></div>
+        </div>
+      </div>
+      <div class="streak-badge">🔥 <span id="hydStreak">0</span> Day Streak</div>
+    </div>
+
+    <div class="sec-label">Quick Add</div>
+    <div class="quick-add-grid">
+      <div class="quick-add-btn" onclick="addWater(250)">250<span>ml · Glass</span></div>
+      <div class="quick-add-btn" onclick="addWater(500)">500<span>ml · Bottle</span></div>
+      <div class="quick-add-btn" onclick="addWater(750)">750<span>ml · Large</span></div>
+      <div class="quick-add-btn" onclick="addWater(1000)">1000<span>ml · 1 Litre</span></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:14px;align-items:flex-end;flex-wrap:wrap;">
+      <div style="flex:1;min-width:140px;">
+        <label>Custom Amount (ml)</label>
+        <input type="number" id="customWater" placeholder="Enter ml">
+      </div>
+      <button class="btn btn-ghost" onclick="addWater(parseInt(document.getElementById('customWater').value)||0)">Add</button>
+      <button class="btn btn-danger" onclick="resetTodayWater()" style="margin-left:auto;">Reset Day</button>
+    </div>
+
+    <div style="margin-top:14px;max-width:260px;">
+      <label>Daily Goal (ml)</label>
+      <input type="number" id="hydGoalInput" value="3500" onchange="updateHydGoal()">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="sec-label">Today</div>
+        <div class="chart-wrap"><canvas id="hydDayChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">This Week</div>
+        <div class="chart-wrap"><canvas id="hydWeekChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">This Month</div>
+        <div class="chart-wrap"><canvas id="hydMonthChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recipes & Meal Preps -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Recipes & Meal Preps</div>
+      <button class="btn btn-primary" onclick="openRecipeModal()">+ Add Recipe</button>
+    </div>
+    <div class="tag-filter-row" id="recipeTagFilter"></div>
+    <div class="search-input-wrap" style="margin-bottom:16px;">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search recipes..." id="recipeSearch" oninput="renderRecipes()">
+    </div>
+    <div id="recipeGrid" class="card-grid card-grid-3"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 4: INCOME ═══ -->
+<div class="panel" id="panel-income">
+  <div class="page-header">
+    <div class="page-title">INCOME <span>TRACKER</span></div>
+    <div class="page-sub">Sponsors · Coaching · Business · Other</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Total Earnings</div>
+    <div class="income-sources" id="incomeSources"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Log Income</div>
+    <div class="card">
+      <div class="form-row form-row-4">
+        <div>
+          <label>Date</label>
+          <input type="date" id="incomeDate">
+        </div>
+        <div>
+          <label>Source</label>
+          <select id="incomeSource">
+            <option value="sponsors">Sponsors</option>
+            <option value="coaching">Coaching</option>
+            <option value="business">Business</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Amount (KWD)</label>
+          <input type="number" id="incomeAmount" placeholder="0.000" step="0.001">
+        </div>
+        <div>
+          <label>Description</label>
+          <input type="text" id="incomeDesc" placeholder="e.g. Academy coaching">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="logIncome()">Add Income</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card-grid" style="grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="sec-label">Monthly Earnings (KWD)</div>
+        <div class="chart-wrap-lg"><canvas id="incomeMonthChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">By Category</div>
+        <div class="chart-wrap-lg"><canvas id="incomeCatChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Income History</div>
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead><tr><th>Date</th><th>Source</th><th>Description</th><th>Amount</th></tr></thead>
+        <tbody id="incomeHistBody">
+          <tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">No income logged yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 5: TOURNAMENTS ═══ -->
+<div class="panel" id="panel-tournaments">
+  <div class="page-header">
+    <div class="page-title">TOURNAMENT <span>PLANNER</span></div>
+    <div class="page-sub">Upcoming events · Travel logistics · Results archive</div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Upcoming Tournaments</div>
+      <button class="btn btn-primary" onclick="openTournModal()">+ Add Tournament</button>
+    </div>
+    <div id="upcomingTournaments" class="card-grid card-grid-2"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Past Tournaments</div>
+    <div id="pastTournaments" class="card-grid card-grid-2"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 6: MATCH LOG ═══ -->
+<div class="panel" id="panel-matches">
+  <div class="page-header">
+    <div class="page-title">MATCH <span>LOG</span></div>
+    <div class="page-sub">Win/loss · Tactics · Mental notes</div>
+  </div>
+
+  <div class="section">
+    <div class="card-grid card-grid-4">
+      <div class="card" style="text-align:center;">
+        <div class="stat-big" id="matchTotal">0</div>
+        <div class="stat-label">Total Matches</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="stat-big color-accent" id="matchWins">0</div>
+        <div class="stat-label">Wins</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="stat-big color-gym" id="matchLosses">0</div>
+        <div class="stat-label">Losses</div>
+      </div>
+      <div class="card" style="display:flex;align-items:center;justify-content:center;gap:14px;">
+        <div class="win-circle">
+          <div class="win-pct" id="matchWinPct">0%</div>
+          <div class="win-lbl">Win Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="sec-label">Wins vs Losses Over Time</div>
+      <div class="chart-wrap"><canvas id="matchChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Match History</div>
+      <button class="btn btn-primary" onclick="openMatchModal()">+ Log Match</button>
+    </div>
+    <div id="matchGrid" class="card-grid card-grid-2"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 6b: DRILL LIBRARY ═══ -->
+<div class="panel" id="panel-drills">
+  <div class="page-header">
+    <div class="page-title">DRILL <span>LIBRARY</span></div>
+    <div class="page-sub">Save reusable solo sessions, drills & routines · Step by step</div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Saved Sessions</div>
+      <button class="btn btn-primary" onclick="openDrillModal()">+ Save Session</button>
+    </div>
+    <div class="tag-filter-row" id="drillTagFilter"></div>
+    <div class="search-input-wrap" style="margin-bottom:16px;">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search saved sessions..." id="drillSearch" oninput="renderDrills()">
+    </div>
+    <div id="drillGrid" class="card-grid card-grid-2"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 7: JOURNAL ═══ -->
+<div class="panel" id="panel-journal">
+  <div class="page-header">
+    <div class="page-title">JOURNAL</div>
+    <div class="page-sub">Write freely · Pick a template · Track how you're feeling</div>
+  </div>
+
+  <!-- Write -->
+  <div class="section">
+    <div class="sec-label">Write an Entry</div>
+    <div class="journal-write-wrap">
+      <div class="template-row" id="templateRow"></div>
+      <input type="text" class="journal-title-input" id="jTitle" placeholder="Entry title...">
+      <div class="journal-meta-row">
+        <div style="min-width:160px;"><label>Date</label><input type="date" id="jDate"></div>
+      </div>
+      <textarea class="journal-editor" id="jContent" placeholder="Start writing..."></textarea>
+      <div class="mini-slider-grid">
+        <div class="mini-slider-item">
+          <label>Energy</label>
+          <div class="slider-wrap"><input type="range" id="jEnergy" min="1" max="10" value="7" style="flex:1" oninput="document.getElementById('jEnergyVal').textContent=this.value"><div class="slider-val" id="jEnergyVal">7</div></div>
+        </div>
+        <div class="mini-slider-item">
+          <label>Motivation</label>
+          <div class="slider-wrap"><input type="range" id="jMotivation" min="1" max="10" value="7" style="flex:1" oninput="document.getElementById('jMotivationVal').textContent=this.value"><div class="slider-val" id="jMotivationVal">7</div></div>
+        </div>
+        <div class="mini-slider-item">
+          <label>Recovery</label>
+          <div class="slider-wrap"><input type="range" id="jRecovery" min="1" max="10" value="7" style="flex:1" oninput="document.getElementById('jRecoveryVal').textContent=this.value"><div class="slider-val" id="jRecoveryVal">7</div></div>
+        </div>
+        <div class="mini-slider-item">
+          <label>Sleep</label>
+          <div class="slider-wrap"><input type="range" id="jSleep" min="1" max="10" value="7" style="flex:1" oninput="document.getElementById('jSleepVal').textContent=this.value"><div class="slider-val" id="jSleepVal">7</div></div>
+        </div>
+      </div>
+      <div class="journal-footer-row">
+        <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);">Template: <span id="activeTemplateLabel" style="color:var(--purple);">Free Write</span></div>
+        <button class="btn btn-primary" onclick="saveJournal()">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Past entries -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div class="sec-label" style="margin-bottom:0;">Past Entries</div>
+    </div>
+    <div class="search-input-wrap" style="margin-bottom:16px;">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search journal entries..." id="journalSearch" oninput="renderJournal()">
+    </div>
+    <div id="journalGrid" class="card-grid card-grid-2"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB 8: ANALYTICS ═══ -->
+<div class="panel" id="panel-analytics">
+  <div class="page-header">
+    <div class="page-title">ANALYTICS <span>HUB</span></div>
+    <div class="page-sub">Performance overview · Trends · Insights</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Key Performance Indicators</div>
+    <div class="analytics-kpi" id="analyticsKPI"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Trend Charts</div>
+    <div class="analytics-charts">
+      <div class="card">
+        <div class="sec-label">Running Volume Trend</div>
+        <div class="chart-wrap"><canvas id="aRunChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Hydration Trend (ml/day avg)</div>
+        <div class="chart-wrap"><canvas id="aHydChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Income Trend (KWD)</div>
+        <div class="chart-wrap"><canvas id="aIncomeChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="sec-label">Training Frequency</div>
+        <div class="chart-wrap"><canvas id="aTrainChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Session Modal -->
+<div class="modal-overlay" id="sessionModal">
+  <div class="modal" style="position:relative;">
+    <div class="modal-title" id="sessionModalTitle">Add Session</div>
+    <div class="form-row form-row-2">
+      <div>
+        <label>Session Type</label>
+        <select id="sessionType">
+          <option value="squash">Squash</option>
+          <option value="gym">Gym</option>
+          <option value="running">Running</option>
+          <option value="recovery">Recovery</option>
+          <option value="tournament">Tournament</option>
+        </select>
+      </div>
+      <div>
+        <label>Day</label>
+        <select id="sessionDay">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Session Title</label>
+        <input type="text" id="sessionTitle" placeholder="e.g. Solo Drill — Cross-courts">
+      </div>
+    </div>
+    <div class="form-row form-row-2">
+      <div>
+        <label>Time</label>
+        <input type="text" id="sessionTime" placeholder="e.g. 07:00–08:30">
+      </div>
+      <div>
+        <label>Duration (mins)</label>
+        <input type="number" id="sessionDuration" placeholder="90">
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Notes</label>
+        <textarea id="sessionNotes" rows="2" placeholder="Optional details..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('sessionModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSession()">Save Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tournament Modal -->
+<div class="modal-overlay" id="tournModal">
+  <div class="modal" style="position:relative;">
+    <div class="modal-title">Add Tournament</div>
+    <div class="form-row">
+      <div><label>Tournament Name</label><input type="text" id="tName" placeholder="PSA Kuwait Open"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Location</label><input type="text" id="tLocation" placeholder="Kuwait City"></div>
+      <div><label>Category</label><input type="text" id="tCategory" placeholder="PSA / ESF / Club"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Start Date</label><input type="date" id="tStart"></div>
+      <div><label>End Date</label><input type="date" id="tEnd"></div>
+    </div>
+    <div class="form-row form-row-3">
+      <div><label>Registration</label>
+        <select id="tReg"><option value="not-started">Not Started</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option></select>
+      </div>
+      <div><label>Travel</label>
+        <select id="tTravel"><option value="not-started">Not Booked</option><option value="pending">In Progress</option><option value="confirmed">Booked</option></select>
+      </div>
+      <div><label>Hotel</label>
+        <select id="tHotel"><option value="not-started">Not Booked</option><option value="pending">In Progress</option><option value="confirmed">Booked</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Notes</label><textarea id="tNotes" rows="2" placeholder="Visa required, court surface, etc."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('tournModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTournament()">Save Tournament</button>
+    </div>
+  </div>
+</div>
+
+<!-- Match Modal -->
+<div class="modal-overlay" id="matchModal">
+  <div class="modal" style="position:relative;">
+    <div class="modal-title">Log Match</div>
+    <div class="form-row form-row-2">
+      <div><label>Date</label><input type="date" id="mDate"></div>
+      <div><label>Opponent</label><input type="text" id="mOpponent" placeholder="Ali Al-Rashidi"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Type</label>
+        <select id="mType"><option value="tournament">Tournament</option><option value="training">Training Match</option><option value="friendly">Friendly</option></select>
+      </div>
+      <div><label>Result</label>
+        <select id="mResult"><option value="win">Win</option><option value="loss">Loss</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Scoreline (e.g. 3-1 or 11-8, 11-6, 9-11, 11-7)</label>
+        <input type="text" id="mScore" placeholder="3-1"></div>
+    </div>
+    <div class="form-row">
+      <div><label>What Worked Well</label><textarea id="mWorked" rows="2" placeholder="Tight rail backhand, length control..."></textarea></div>
+    </div>
+    <div class="form-row">
+      <div><label>What Needs Improvement</label><textarea id="mImprove" rows="2" placeholder="Front left court movement..."></textarea></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Tactical Notes</label><textarea id="mTactics" rows="2" placeholder="Used boast to open court..."></textarea></div>
+      <div><label>Mental Notes</label><textarea id="mMental" rows="2" placeholder="Stayed composed in tie-break..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('matchModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMatch()">Save Match</button>
+    </div>
+  </div>
+</div>
+
+<!-- Journal View Modal (read-only) -->
+<div class="modal-overlay" id="journalViewModal">
+  <div class="modal" style="position:relative;max-width:600px;">
+    <button class="close-modal" onclick="closeModal('journalViewModal')">✕</button>
+    <div class="journal-date" id="jvDate" style="margin-bottom:4px;"></div>
+    <div class="journal-entry-title" id="jvTitle" style="font-size:24px;margin-bottom:14px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:18px;">
+      <div><div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Energy</div><div class="rating-display" id="jvEnergy"></div></div>
+      <div><div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Motivation</div><div class="rating-display" id="jvMotivation"></div></div>
+      <div><div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Recovery</div><div class="rating-display" id="jvRecovery"></div></div>
+      <div><div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Sleep</div><div class="rating-display" id="jvSleep"></div></div>
+    </div>
+    <div class="journal-view-body" id="jvContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="jvDeleteBtn">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('journalViewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Recipe Modal -->
+<div class="modal-overlay" id="recipeModal">
+  <div class="modal" style="position:relative;">
+    <div class="modal-title" id="recipeModalTitle">Add Recipe</div>
+    <div class="form-row form-row-2">
+      <div><label>Recipe Name</label><input type="text" id="rName" placeholder="e.g. Chicken & Rice Meal Prep"></div>
+      <div><label>Tag</label>
+        <select id="rTag">
+          <option value="meal-prep">Meal Prep</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
+          <option value="high-protein">High Protein</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row form-row-4">
+      <div><label>Calories</label><input type="number" id="rCals" placeholder="0"></div>
+      <div><label>Protein (g)</label><input type="number" id="rProtein" placeholder="0"></div>
+      <div><label>Carbs (g)</label><input type="number" id="rCarbs" placeholder="0"></div>
+      <div><label>Fat (g)</label><input type="number" id="rFat" placeholder="0"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Servings</label><input type="number" id="rServings" value="1" placeholder="1"></div>
+      <div><label>Prep Time</label><input type="text" id="rPrepTime" placeholder="e.g. 20 min"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Ingredients (one per line)</label><textarea id="rIngredients" rows="4" placeholder="200g chicken breast&#10;150g white rice&#10;1 tbsp olive oil"></textarea></div>
+    </div>
+    <div class="form-row">
+      <div><label>Instructions</label><textarea id="rInstructions" rows="3" placeholder="How to prepare it..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('recipeModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRecipe()">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drill Modal -->
+<div class="modal-overlay" id="drillModal">
+  <div class="modal" style="position:relative;">
+    <div class="modal-title" id="drillModalTitle">Save Session</div>
+    <div class="form-row form-row-2">
+      <div><label>Session Name</label><input type="text" id="dName" placeholder="e.g. Solo — Straight Drives Focus"></div>
+      <div><label>Type</label>
+        <select id="dType">
+          <option value="squash-solo">Squash — Solo</option>
+          <option value="squash-match">Squash — Match Play</option>
+          <option value="gym">Gym</option>
+          <option value="running">Running</option>
+          <option value="recovery">Recovery</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Duration (min)</label><input type="number" id="dDuration" placeholder="60"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Steps (one per line)</label><textarea id="dSteps" rows="6" placeholder="Straight drives x5min&#10;Cross-courts x5min&#10;Boast & drive x5min&#10;Ghosting x10min&#10;Cool down & stretch"></textarea></div>
+    </div>
+    <div class="form-row">
+      <div><label>Notes (optional)</label><textarea id="dNotes" rows="2" placeholder="Focus cues, equipment needed, anything else..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('drillModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDrill()">Save Session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA STORE (localStorage)
+// ═══════════════════════════════════════════════════════
+const DB = {
+  get(k) { try { return JSON.parse(localStorage.getItem('ph_' + k)) || null; } catch { return null; } },
+  set(k, v) { localStorage.setItem('ph_' + k, JSON.stringify(v)); },
+  push(k, item) {
+    const arr = this.get(k) || [];
+    item.id = Date.now() + Math.random().toString(36).slice(2,7);
+    arr.push(item);
+    this.set(k, arr);
+    return item;
+  },
+  remove(k, id) {
+    const arr = (this.get(k) || []).filter(i => i.id !== id);
+    this.set(k, arr);
+  },
+  update(k, id, updates) {
+    const arr = this.get(k) || [];
+    const idx = arr.findIndex(i => i.id === id);
+    if (idx >= 0) { arr[idx] = { ...arr[idx], ...updates }; this.set(k, arr); }
+  }
+};
+
+// Default schedule data
+function getDefaultSessions() {
+  return [
+    {id:'d1',day:1,type:'squash',title:'Solo Drill — Cross-courts',time:'07:00–08:30',duration:90,notes:'200 cross-courts'},
+    {id:'d2',day:1,type:'gym',title:'Power & Strength',time:'10:00–11:30',duration:90,notes:'Power clean 4×4, Back squat'},
+    {id:'d3',day:1,type:'running',title:'Easy Run — Z2',time:'17:30–18:10',duration:40,notes:'6 km @ Z2 HR <150'},
+    {id:'d4',day:2,type:'squash',title:'Match Play + Ghosting',time:'07:00–09:00',duration:120,notes:'Sparring 60min + ghosting 30min'},
+    {id:'d5',day:2,type:'recovery',title:'Contrast Therapy',time:'20:00–20:30',duration:30,notes:'Hot/cold protocol'},
+    {id:'d6',day:3,type:'squash',title:'Solo Drill — Rails',time:'07:00–08:00',duration:60,notes:'50 rails per side'},
+    {id:'d7',day:3,type:'gym',title:'Functional Conditioning',time:'10:00–11:30',duration:90,notes:'Kettlebell, assault bike'},
+    {id:'d8',day:3,type:'running',title:'Tempo Run',time:'17:30–18:20',duration:50,notes:'4 km @ threshold'},
+    {id:'d9',day:4,type:'squash',title:'Match Play',time:'07:00–09:00',duration:120,notes:'Full sparring — tactical focus'},
+    {id:'d10',day:4,type:'gym',title:'Power & Strength',time:'10:00–11:00',duration:60,notes:'Repeat Monday lifts'},
+    {id:'d11',day:5,type:'squash',title:'Light Technical',time:'07:00–07:45',duration:45,notes:'Feeds only, no fitness'},
+    {id:'d12',day:5,type:'recovery',title:'Contrast + Rolling',time:'20:00–20:45',duration:45,notes:'Full recovery session'},
+    {id:'d13',day:6,type:'squash',title:'Solo Drill — Full Court',time:'07:00–08:30',duration:90,notes:'Drives, nicks, angles'},
+    {id:'d14',day:6,type:'running',title:'Norwegian 4×4',time:'10:00–11:30',duration:90,notes:'9 km total, intervals'},
+    {id:'d15',day:0,type:'squash',title:'Match Play — Sparring',time:'09:00–11:00',duration:120,notes:'Competitive matches'},
+  ];
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  // Lazy-init charts when tab becomes visible
+  if (tab === 'running') initRunCharts();
+  if (tab === 'nutrition') { initHydCharts(); initNutCharts(); renderRecipes(); }
+  if (tab === 'drills') renderDrills();
+  if (tab === 'income') { renderIncomeSources(); renderIncomeHistory(); initIncomeCharts(); }
+  if (tab === 'analytics') initAnalyticsCharts();
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function chartDefaults() {
+  Chart.defaults.color = '#4A4F55';
+  Chart.defaults.borderColor = '#1E2328';
+  Chart.defaults.font.family = "'DM Mono', monospace";
+  Chart.defaults.font.size = 10;
+}
+chartDefaults();
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); };
+
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function today() { return new Date().toISOString().split('T')[0]; }
+
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ═══════════════════════════════════════════════════════
+// TAB 1: TRAINING SCHEDULE
+// ═══════════════════════════════════════════════════════
+let editingSessionId = null;
+
+function initSchedule() {
+  const now = new Date();
+  const sunday = new Date(now);
+  sunday.setDate(now.getDate() - now.getDay());
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() + 6);
+  document.getElementById('weekLabel').textContent =
+    `${sunday.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} — ${saturday.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}`;
+
+  if (!DB.get('sessions')) DB.set('sessions', getDefaultSessions());
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const sessions = DB.get('sessions') || [];
+  const header = document.getElementById('weekHeader');
+  const grid = document.getElementById('weekGrid');
+
+  header.innerHTML = DAYS.map(d => `
+    <div class="day-head">
+      <div class="day-name-big">${d}</div>
+    </div>
+  `).join('');
+
+  grid.innerHTML = DAYS.map((d, i) => {
+    const daySessions = sessions.filter(s => parseInt(s.day) === i);
+    const sessionsHtml = daySessions.map(s => sessionBlockHTML(s)).join('');
+    return `
+      <div class="day-col" id="day-${i}" data-day="${i}">
+        ${sessionsHtml}
+        <button class="add-session-btn" onclick="openAddSession(${i})">+ Add</button>
+      </div>`;
+  }).join('');
+
+  // Init sortable on each day col
+  DAYS.forEach((_, i) => {
+    const el = document.getElementById('day-' + i);
+    if (el && !el._sortable) {
+      el._sortable = Sortable.create(el, {
+        group: 'sessions',
+        animation: 150,
+        ghostClass: 'drag-ghost',
+        filter: '.add-session-btn',
+        onEnd(evt) {
+          const id = evt.item.dataset.id;
+          const newDay = parseInt(evt.to.dataset.day);
+          DB.update('sessions', id, { day: newDay });
+          updateWeeklySummary();
+        }
+      });
+    }
+  });
+
+  updateWeeklySummary();
+}
+
+function sessionBlockHTML(s) {
+  return `<div class="session-block type-${s.type}" data-id="${s.id}" draggable="true">
+    <div class="sb-actions">
+      <button class="sb-btn sb-btn-edit" onclick="editSession('${s.id}')">✎</button>
+      <button class="sb-btn sb-btn-del" onclick="deleteSession('${s.id}')">✕</button>
+    </div>
+    <div class="sb-type">${s.type}</div>
+    <div class="sb-title">${s.title}</div>
+    <div class="sb-meta">${s.time || ''} ${s.duration ? '· ' + s.duration + 'min' : ''}</div>
+  </div>`;
+}
+
+function openAddSession(day) {
+  editingSessionId = null;
+  document.getElementById('sessionModalTitle').textContent = 'Add Session';
+  document.getElementById('sessionDay').value = day;
+  document.getElementById('sessionType').value = 'squash';
+  document.getElementById('sessionTitle').value = '';
+  document.getElementById('sessionTime').value = '';
+  document.getElementById('sessionDuration').value = '';
+  document.getElementById('sessionNotes').value = '';
+  openModal('sessionModal');
+}
+
+function editSession(id) {
+  const s = (DB.get('sessions') || []).find(x => x.id === id);
+  if (!s) return;
+  editingSessionId = id;
+  document.getElementById('sessionModalTitle').textContent = 'Edit Session';
+  document.getElementById('sessionDay').value = s.day;
+  document.getElementById('sessionType').value = s.type;
+  document.getElementById('sessionTitle').value = s.title;
+  document.getElementById('sessionTime').value = s.time || '';
+  document.getElementById('sessionDuration').value = s.duration || '';
+  document.getElementById('sessionNotes').value = s.notes || '';
+  openModal('sessionModal');
+}
+
+function saveSession() {
+  const data = {
+    day: parseInt(document.getElementById('sessionDay').value),
+    type: document.getElementById('sessionType').value,
+    title: document.getElementById('sessionTitle').value || 'Untitled Session',
+    time: document.getElementById('sessionTime').value,
+    duration: parseInt(document.getElementById('sessionDuration').value) || 60,
+    notes: document.getElementById('sessionNotes').value
+  };
+  if (editingSessionId) {
+    DB.update('sessions', editingSessionId, data);
+  } else {
+    DB.push('sessions', data);
+  }
+  closeModal('sessionModal');
+  renderSchedule();
+}
+
+function deleteSession(id) {
+  DB.remove('sessions', id);
+  renderSchedule();
+}
+
+function updateWeeklySummary() {
+  const sessions = DB.get('sessions') || [];
+  const totalMins = sessions.reduce((a, s) => a + (parseInt(s.duration) || 60), 0);
+  document.getElementById('totalHours').innerHTML = (totalMins / 60).toFixed(1) + '<span style="font-size:20px;color:var(--muted)">h</span>';
+  document.getElementById('totalSessions').textContent = sessions.length;
+  const runKm = sessions.filter(s => s.type === 'running').length * 6; // estimate
+  document.getElementById('totalRunKm').innerHTML = runKm + '<span style="font-size:20px;color:var(--muted)">km</span>';
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 2: RUNNING
+// ═══════════════════════════════════════════════════════
+const runProgression = {
+  easy: { base: 6, rate: 0.075, label: 'Easy Run', fixed: false },
+  tempo: { base: 4, rate: 0.075, label: 'Tempo Run', fixed: false },
+  norwegian: { base: 9, rate: 0, label: 'Norwegian 4×4', fixed: true }
+};
+
+function getRunWeek() { return parseInt(DB.get('runWeek') || 1); }
+function getRunTarget(type) {
+  const p = runProgression[type];
+  const week = getRunWeek();
+  if (p.fixed) return p.base;
+  return Math.round((p.base * Math.pow(1 + p.rate, week - 1)) * 10) / 10;
+}
+
+function initRunning() {
+  const week = getRunWeek();
+  document.getElementById('runWeekNum').textContent = week;
+  document.getElementById('runDate').value = today();
+
+  const cards = document.getElementById('runTypeCards');
+  cards.innerHTML = Object.entries(runProgression).map(([type, p]) => {
+    const target = getRunTarget(type);
+    return `
+    <div class="run-card">
+      <div class="run-type-label">${p.label}</div>
+      <div class="run-distance-big">${target}<span>km</span></div>
+      <div class="run-progression">${p.fixed ? 'Fixed distance — always 9 km' : `~${(p.rate*100).toFixed(0)}% progression per week`}</div>
+      <button class="btn btn-ghost run-log-btn" onclick="setRunType('${type}')">Log This Run</button>
+    </div>`;
+  }).join('');
+
+  renderRunHistory();
+  updateRunPBs();
+}
+
+function setRunType(type) {
+  document.getElementById('runType').value = type;
+  document.getElementById('runDist').value = getRunTarget(type);
+  document.querySelector('#panel-running .section:nth-child(2)').scrollIntoView({ behavior: 'smooth' });
+}
+
+function logRun() {
+  const run = {
+    date: document.getElementById('runDate').value || today(),
+    type: document.getElementById('runType').value,
+    distance: parseFloat(document.getElementById('runDist').value) || 0,
+    pace: document.getElementById('runPace').value,
+    hr: document.getElementById('runHR').value,
+    rpe: document.getElementById('runRPE').value
+  };
+  if (!run.distance) return alert('Please enter a distance');
+  DB.push('runs', run);
+  renderRunHistory();
+  updateRunPBs();
+  initRunCharts();
+  ['runDist','runPace','runHR','runRPE'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderRunHistory() {
+  const runs = (DB.get('runs') || []).slice().reverse();
+  const body = document.getElementById('runHistoryBody');
+  if (!runs.length) {
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No runs logged yet</td></tr>';
+    return;
+  }
+  body.innerHTML = runs.map(r => `
+    <tr>
+      <td>${formatDate(r.date)}</td>
+      <td><span class="tag" style="background:rgba(60,180,255,.08);color:var(--run)">${runProgression[r.type]?.label || r.type}</span></td>
+      <td style="color:var(--run);font-family:'Bebas Neue',sans-serif;font-size:18px;">${r.distance}km</td>
+      <td>${r.pace || '—'}</td>
+      <td>${r.hr ? r.hr + ' bpm' : '—'}</td>
+      <td>${r.rpe ? r.rpe + '/10' : '—'}</td>
+    </tr>`).join('');
+}
+
+function updateRunPBs() {
+  const runs = DB.get('runs') || [];
+  const easyBest = Math.max(0, ...runs.filter(r => r.type === 'easy').map(r => r.distance));
+  const tempoBest = Math.max(0, ...runs.filter(r => r.type === 'tempo').map(r => r.distance));
+  const bestPace = runs.filter(r => r.pace).map(r => r.pace).sort()[0];
+  document.getElementById('pbEasyVal').textContent = easyBest ? easyBest + ' km' : '—';
+  document.getElementById('pbTempoVal').textContent = tempoBest ? tempoBest + ' km' : '—';
+  document.getElementById('pbPaceVal').textContent = bestPace || '—';
+}
+
+let runWeeklyChart, runTrendChart;
+function initRunCharts() {
+  const runs = DB.get('runs') || [];
+  const last7 = Array.from({length:7}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const weeklyData = last7.map(d => runs.filter(r => r.date === d).reduce((a, r) => a + r.distance, 0));
+  const weeklyLabels = last7.map(d => DAYS[new Date(d).getDay()]);
+
+  if (runWeeklyChart) runWeeklyChart.destroy();
+  runWeeklyChart = new Chart(document.getElementById('runWeeklyChart'), {
+    type: 'bar',
+    data: { labels: weeklyLabels, datasets: [{ label: 'km', data: weeklyData, backgroundColor: 'rgba(60,180,255,.25)', borderColor: '#3CB4FF', borderWidth: 1.5, borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Trend by week
+  const weeks = 8;
+  const trendData = Array.from({length:weeks}, (_, i) => {
+    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - (weeks - 1 - i) * 7 - weekStart.getDay());
+    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+    return { week: `W${weeks - i}`, total: runs.filter(r => { const rd = new Date(r.date); return rd >= weekStart && rd <= weekEnd; }).reduce((a,r) => a + r.distance, 0) };
+  });
+
+  if (runTrendChart) runTrendChart.destroy();
+  runTrendChart = new Chart(document.getElementById('runTrendChart'), {
+    type: 'line',
+    data: { labels: trendData.map(x => x.week), datasets: [{ label: 'Weekly km', data: trendData.map(x => x.total), borderColor: '#3CB4FF', backgroundColor: 'rgba(60,180,255,.08)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#3CB4FF' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 3: NUTRITION & HYDRATION
+// ═══════════════════════════════════════════════════════
+let hydGoal = 3500;
+let hydDayChart, hydWeekChart, hydMonthChart;
+
+function initHydration() {
+  hydGoal = DB.get('hydGoal') || 3500;
+  document.getElementById('hydGoalInput').value = hydGoal;
+  document.getElementById('hydGoalDisplay').textContent = hydGoal;
+  updateHydDisplay();
+}
+
+function updateHydGoal() {
+  hydGoal = parseInt(document.getElementById('hydGoalInput').value) || 3500;
+  DB.set('hydGoal', hydGoal);
+  document.getElementById('hydGoalDisplay').textContent = hydGoal;
+  updateHydDisplay();
+}
+
+function addWater(ml) {
+  if (!ml || ml <= 0) return;
+  const key = 'hyd_' + today();
+  const current = DB.get(key) || 0;
+  DB.set(key, current + ml);
+  document.getElementById('customWater').value = '';
+  updateHydDisplay();
+  initHydCharts();
+}
+
+function resetTodayWater() {
+  DB.set('hyd_' + today(), 0);
+  updateHydDisplay();
+  initHydCharts();
+}
+
+function updateHydDisplay() {
+  const current = DB.get('hyd_' + today()) || 0;
+  const pct = Math.min(100, Math.round(current / hydGoal * 100));
+  document.getElementById('todayWater').textContent = current;
+  document.getElementById('hydPctDisplay').textContent = pct + '%';
+  document.getElementById('hydProgressBar').style.width = pct + '%';
+  document.getElementById('hydProgressBar').style.background = pct >= 100 ? 'var(--accent)' : 'var(--run)';
+
+  // Streak
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const k = 'hyd_' + d.toISOString().split('T')[0];
+    if ((DB.get(k) || 0) >= hydGoal) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  document.getElementById('hydStreak').textContent = streak;
+}
+
+function initHydCharts() {
+  const last7 = Array.from({length:7}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const weekData = last7.map(d => DB.get('hyd_' + d) || 0);
+  const weekLabels = last7.map(d => DAYS[new Date(d).getDay()]);
+
+  const last30 = Array.from({length:30}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const monthData = last30.map(d => DB.get('hyd_' + d) || 0);
+  const monthLabels = last30.map(d => new Date(d).getDate());
+
+  const todayVal = DB.get('hyd_' + today()) || 0;
+  const remaining = Math.max(0, hydGoal - todayVal);
+
+  if (hydDayChart) hydDayChart.destroy();
+  hydDayChart = new Chart(document.getElementById('hydDayChart'), {
+    type: 'doughnut',
+    data: { labels: ['Drunk', 'Remaining'], datasets: [{ data: [todayVal, remaining], backgroundColor: ['#3CB4FF', '#1E2328'], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '72%' }
+  });
+
+  if (hydWeekChart) hydWeekChart.destroy();
+  hydWeekChart = new Chart(document.getElementById('hydWeekChart'), {
+    type: 'bar',
+    data: { labels: weekLabels, datasets: [{ data: weekData, backgroundColor: weekData.map(v => v >= hydGoal ? 'rgba(200,240,60,.4)' : 'rgba(60,180,255,.25)'), borderColor: weekData.map(v => v >= hydGoal ? '#C8F03C' : '#3CB4FF'), borderWidth: 1.5, borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  if (hydMonthChart) hydMonthChart.destroy();
+  hydMonthChart = new Chart(document.getElementById('hydMonthChart'), {
+    type: 'line',
+    data: { labels: monthLabels, datasets: [{ data: monthData, borderColor: '#3CB4FF', backgroundColor: 'rgba(60,180,255,.07)', fill: true, tension: 0.3, pointRadius: 2, pointBackgroundColor: '#3CB4FF' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 3b: NUTRITION (per-day macros, meals, recipes)
+// ═══════════════════════════════════════════════════════
+const macroColors = { cals: '#C8F03C', protein: '#FF4D1C', carbs: '#3CB4FF', fat: '#FFD600' };
+const macroUnits = { cals: '', protein: 'g', carbs: 'g', fat: 'g' };
+const macroLabels = { cals: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat' };
+const defaultNutGoal = { cals: 2600, protein: 180, carbs: 280, fat: 80 };
+let nutWeekChart, nutMacroChart;
+let nutViewDate = today();
+
+function getNutGoalsForDate(date) {
+  const byDate = DB.get('nutGoalsByDate') || {};
+  return byDate[date] || { ...defaultNutGoal };
+}
+
+function setNutGoalsForDate(date, goals) {
+  const byDate = DB.get('nutGoalsByDate') || {};
+  byDate[date] = goals;
+  DB.set('nutGoalsByDate', byDate);
+}
+
+function dayLabelFor(date) {
+  if (date === today()) return 'Today';
+  const d = new Date(date + 'T00:00:00');
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  if (date === y.toISOString().split('T')[0]) return 'Yesterday';
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  if (date === t.toISOString().split('T')[0]) return 'Tomorrow';
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function shiftNutDay(delta) {
+  const d = new Date(nutViewDate + 'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  setNutDate(d.toISOString().split('T')[0]);
+}
+
+function setNutDate(date) {
+  nutViewDate = date || today();
+  document.getElementById('nutDateInput').value = nutViewDate;
+  const lbl = dayLabelFor(nutViewDate);
+  ['nutDayLabel','nutDayLabel2','nutDayLabel3','nutDayLabel4','nutDayLabel5'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = lbl;
+  });
+  const goals = getNutGoalsForDate(nutViewDate);
+  document.getElementById('goalCals').value = goals.cals;
+  document.getElementById('goalProtein').value = goals.protein;
+  document.getElementById('goalCarbs').value = goals.carbs;
+  document.getElementById('goalFat').value = goals.fat;
+  renderNutSessionHint();
+  renderMealLog();
+  updateNutDisplay();
+  initNutCharts();
+}
+
+function renderNutSessionHint() {
+  const dow = new Date(nutViewDate + 'T00:00:00').getDay();
+  const sessions = (DB.get('sessions') || []).filter(s => parseInt(s.day) === dow);
+  const hint = document.getElementById('nutSessionHint');
+  if (!sessions.length) {
+    hint.textContent = 'No sessions scheduled this day — adjust your target accordingly.';
+    return;
+  }
+  hint.innerHTML = 'Scheduled: ' + sessions.map(s => `<span style="color:var(--white);">${s.title}</span> (${s.type})`).join(' · ');
+}
+
+function initNutrition() {
+  setNutDate(today());
+}
+
+function updateNutGoals() {
+  const goals = {
+    cals: parseInt(document.getElementById('goalCals').value) || defaultNutGoal.cals,
+    protein: parseInt(document.getElementById('goalProtein').value) || defaultNutGoal.protein,
+    carbs: parseInt(document.getElementById('goalCarbs').value) || defaultNutGoal.carbs,
+    fat: parseInt(document.getElementById('goalFat').value) || defaultNutGoal.fat
+  };
+  setNutGoalsForDate(nutViewDate, goals);
+  updateNutDisplay();
+  initNutCharts();
+}
+
+function mealsForDate(date) {
+  return (DB.get('meals') || []).filter(m => m.date === date);
+}
+
+function logMeal() {
+  const item = {
+    date: nutViewDate,
+    mealType: document.getElementById('mealType').value,
+    name: document.getElementById('mealName').value || 'Untitled item',
+    cals: parseFloat(document.getElementById('mealCals').value) || 0,
+    protein: parseFloat(document.getElementById('mealProtein').value) || 0,
+    carbs: parseFloat(document.getElementById('mealCarbs').value) || 0,
+    fat: parseFloat(document.getElementById('mealFat').value) || 0
+  };
+  DB.push('meals', item);
+  ['mealName','mealCals','mealProtein','mealCarbs','mealFat'].forEach(id => document.getElementById(id).value = '');
+  renderMealLog();
+  updateNutDisplay();
+  initNutCharts();
+}
+
+function deleteMealEntry(id) {
+  DB.remove('meals', id);
+  renderMealLog();
+  updateNutDisplay();
+  initNutCharts();
+}
+
+function renderMealLog() {
+  const meals = mealsForDate(nutViewDate);
+  const body = document.getElementById('mealLogBody');
+  if (!meals.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px;">No meals logged yet</td></tr>';
+    return;
+  }
+  body.innerHTML = meals.map(m => `
+    <tr>
+      <td><span class="meal-type-badge">${m.mealType}</span></td>
+      <td>${m.name}</td>
+      <td>${m.cals}</td>
+      <td>${m.protein}g</td>
+      <td>${m.carbs}g</td>
+      <td>${m.fat}g</td>
+      <td><button class="btn btn-ghost" style="padding:4px 8px;font-size:8px;" onclick="deleteMealEntry('${m.id}')">✕</button></td>
+    </tr>`).join('');
+}
+
+function updateNutDisplay() {
+  const meals = mealsForDate(nutViewDate);
+  const goals = getNutGoalsForDate(nutViewDate);
+  const totals = meals.reduce((acc, m) => {
+    acc.cals += m.cals; acc.protein += m.protein; acc.carbs += m.carbs; acc.fat += m.fat;
+    return acc;
+  }, { cals: 0, protein: 0, carbs: 0, fat: 0 });
+
+  const grid = document.getElementById('macroRingGrid');
+  grid.innerHTML = ['cals','protein','carbs','fat'].map(k => {
+    const pct = Math.min(100, Math.round((totals[k] / (goals[k] || 1)) * 100));
+    return `
+    <div class="macro-ring-card">
+      <div class="macro-ring-label">${macroLabels[k]}</div>
+      <div class="macro-ring-val" style="color:${macroColors[k]}">${Math.round(totals[k])}<span>${macroUnits[k]} / ${goals[k]}${macroUnits[k]}</span></div>
+      <div class="macro-bar-track"><div class="macro-bar-fill" style="width:${pct}%;background:${macroColors[k]}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function initNutCharts() {
+  const last7 = Array.from({length:7}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const allMeals = DB.get('meals') || [];
+  const weekData = last7.map(d => allMeals.filter(m => m.date === d).reduce((a, m) => a + m.cals, 0));
+  const weekGoals = last7.map(d => getNutGoalsForDate(d).cals);
+  const weekLabels = last7.map(d => DAYS[new Date(d).getDay()]);
+
+  if (nutWeekChart) nutWeekChart.destroy();
+  nutWeekChart = new Chart(document.getElementById('nutWeekChart'), {
+    type: 'bar',
+    data: {
+      labels: weekLabels,
+      datasets: [
+        { label: 'Intake', data: weekData, backgroundColor: weekData.map((v,i) => v >= weekGoals[i] ? 'rgba(200,240,60,.4)' : 'rgba(255,77,28,.2)'), borderColor: weekData.map((v,i) => v >= weekGoals[i] ? '#C8F03C' : '#FF4D1C'), borderWidth: 1.5, borderRadius: 3 },
+        { label: 'Target', data: weekGoals, type: 'line', borderColor: '#4A4F55', borderDash: [4,4], borderWidth: 1.5, pointRadius: 0, fill: false }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  const dayTotals = mealsForDate(nutViewDate).reduce((acc, m) => {
+    acc.protein += m.protein; acc.carbs += m.carbs; acc.fat += m.fat;
+    return acc;
+  }, { protein: 0, carbs: 0, fat: 0 });
+
+  if (nutMacroChart) nutMacroChart.destroy();
+  nutMacroChart = new Chart(document.getElementById('nutMacroChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Protein', 'Carbs', 'Fat'],
+      datasets: [{ data: [dayTotals.protein, dayTotals.carbs, dayTotals.fat], backgroundColor: ['#FF4D1C', '#3CB4FF', '#FFD600'], borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, cutout: '65%' }
+  });
+}
+
+// ── Recipes & Meal Preps ──
+let editingRecipeId = null;
+const recipeTagColors = { 'meal-prep': 'var(--accent)', breakfast: '#FFD600', lunch: '#3CB4FF', dinner: '#FF4D1C', snack: '#B87EFF', 'high-protein': '#FF4D1C' };
+
+function getDefaultRecipes() {
+  return [
+    { tag: 'meal-prep', name: 'Chicken, Rice & Broccoli', servings: 4, cals: 520, protein: 48, carbs: 55, fat: 12, prepTime: '35 min', ingredients: '800g chicken breast\n400g white rice (dry)\n400g broccoli\n2 tbsp olive oil\nSalt, pepper, paprika', instructions: 'Season and grill chicken breast. Cook rice. Steam broccoli. Portion into 4 containers.' },
+    { tag: 'high-protein', name: 'Protein Overnight Oats', servings: 1, cals: 420, protein: 32, carbs: 48, fat: 10, prepTime: '5 min + overnight', ingredients: '60g oats\n1 scoop whey protein\n250ml milk\n1 tbsp peanut butter\nHandful berries', instructions: 'Mix oats, protein, and milk in a jar. Refrigerate overnight. Top with peanut butter and berries before eating.' }
+  ];
+}
+
+function openRecipeModal(id) {
+  editingRecipeId = id || null;
+  const recipe = id ? (DB.get('recipes') || []).find(r => r.id === id) : null;
+  document.getElementById('recipeModalTitle').textContent = id ? 'Edit Recipe' : 'Add Recipe';
+  document.getElementById('rName').value = recipe ? recipe.name : '';
+  document.getElementById('rTag').value = recipe ? recipe.tag : 'meal-prep';
+  document.getElementById('rCals').value = recipe ? recipe.cals : '';
+  document.getElementById('rProtein').value = recipe ? recipe.protein : '';
+  document.getElementById('rCarbs').value = recipe ? recipe.carbs : '';
+  document.getElementById('rFat').value = recipe ? recipe.fat : '';
+  document.getElementById('rServings').value = recipe ? recipe.servings : 1;
+  document.getElementById('rPrepTime').value = recipe ? recipe.prepTime : '';
+  document.getElementById('rIngredients').value = recipe ? recipe.ingredients : '';
+  document.getElementById('rInstructions').value = recipe ? recipe.instructions : '';
+  openModal('recipeModal');
+}
+
+function saveRecipe() {
+  const data = {
+    name: document.getElementById('rName').value || 'Untitled Recipe',
+    tag: document.getElementById('rTag').value,
+    cals: parseFloat(document.getElementById('rCals').value) || 0,
+    protein: parseFloat(document.getElementById('rProtein').value) || 0,
+    carbs: parseFloat(document.getElementById('rCarbs').value) || 0,
+    fat: parseFloat(document.getElementById('rFat').value) || 0,
+    servings: parseInt(document.getElementById('rServings').value) || 1,
+    prepTime: document.getElementById('rPrepTime').value,
+    ingredients: document.getElementById('rIngredients').value,
+    instructions: document.getElementById('rInstructions').value
+  };
+  if (editingRecipeId) DB.update('recipes', editingRecipeId, data);
+  else DB.push('recipes', data);
+  closeModal('recipeModal');
+  renderRecipes();
+}
+
+function deleteRecipe(id) {
+  DB.remove('recipes', id);
+  renderRecipes();
+}
+
+function logRecipeAsMeal(id) {
+  const r = (DB.get('recipes') || []).find(x => x.id === id);
+  if (!r) return;
+  DB.push('meals', { date: nutViewDate, mealType: r.tag === 'meal-prep' ? 'lunch' : r.tag, name: r.name, cals: r.cals, protein: r.protein, carbs: r.carbs, fat: r.fat });
+  renderMealLog();
+  updateNutDisplay();
+  initNutCharts();
+}
+
+let activeRecipeTag = 'all';
+function setRecipeTagFilter(tag) {
+  activeRecipeTag = tag;
+  renderRecipes();
+}
+
+function renderRecipes() {
+  if (!DB.get('recipes')) DB.set('recipes', getDefaultRecipes());
+  const recipes = DB.get('recipes') || [];
+  const search = (document.getElementById('recipeSearch')?.value || '').toLowerCase();
+
+  const tags = ['all', ...new Set(recipes.map(r => r.tag))];
+  const filterEl = document.getElementById('recipeTagFilter');
+  filterEl.innerHTML = tags.map(t => `<button class="tag-filter-btn ${t === activeRecipeTag ? 'active' : ''}" onclick="setRecipeTagFilter('${t}')">${t === 'all' ? 'All' : t.replace('-', ' ')}</button>`).join('');
+
+  const filtered = recipes.filter(r =>
+    (activeRecipeTag === 'all' || r.tag === activeRecipeTag) &&
+    (!search || r.name.toLowerCase().includes(search) || (r.ingredients || '').toLowerCase().includes(search))
+  );
+
+  const grid = document.getElementById('recipeGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🍽️</div>No recipes yet. Add your first one!</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(r => `
+    <div class="recipe-card">
+      <div>
+        <div class="recipe-tags"><span class="tag" style="background:rgba(255,255,255,.06);color:${recipeTagColors[r.tag] || 'var(--muted)'}">${r.tag.replace('-', ' ')}</span></div>
+        <div class="recipe-name" style="margin-top:8px;">${r.name}</div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--muted);margin-top:2px;">${r.servings} serving${r.servings > 1 ? 's' : ''}${r.prepTime ? ' · ' + r.prepTime : ''}</div>
+      </div>
+      <div class="recipe-macros">
+        <div class="recipe-macro-item"><div class="recipe-macro-val">${r.cals}</div><div class="recipe-macro-lbl">Cals</div></div>
+        <div class="recipe-macro-item"><div class="recipe-macro-val">${r.protein}g</div><div class="recipe-macro-lbl">Protein</div></div>
+        <div class="recipe-macro-item"><div class="recipe-macro-val">${r.carbs}g</div><div class="recipe-macro-lbl">Carbs</div></div>
+        <div class="recipe-macro-item"><div class="recipe-macro-val">${r.fat}g</div><div class="recipe-macro-lbl">Fat</div></div>
+      </div>
+      ${r.ingredients ? `<div class="recipe-ingredients">${r.ingredients}</div>` : ''}
+      <div class="recipe-actions">
+        <button class="btn btn-primary" onclick="logRecipeAsMeal('${r.id}')">Log to Today</button>
+        <button class="btn btn-ghost" onclick="openRecipeModal('${r.id}')">Edit</button>
+        <button class="btn btn-danger" onclick="deleteRecipe('${r.id}')">Del</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 4: INCOME
+// ═══════════════════════════════════════════════════════
+const incomeColors = { sponsors: '#FFD600', coaching: '#C8F03C', business: '#3CB4FF', other: '#B87EFF' };
+let incomeMonthChart, incomeCatChart;
+
+function logIncome() {
+  const item = {
+    date: document.getElementById('incomeDate').value || today(),
+    source: document.getElementById('incomeSource').value,
+    amount: parseFloat(document.getElementById('incomeAmount').value) || 0,
+    description: document.getElementById('incomeDesc').value
+  };
+  if (!item.amount) return alert('Please enter an amount');
+  DB.push('income', item);
+  renderIncomeSources();
+  renderIncomeHistory();
+  initIncomeCharts();
+  document.getElementById('incomeAmount').value = '';
+  document.getElementById('incomeDesc').value = '';
+}
+
+function renderIncomeSources() {
+  const incomes = DB.get('income') || [];
+  const totals = { sponsors: 0, coaching: 0, business: 0, other: 0 };
+  incomes.forEach(i => totals[i.source] = (totals[i.source] || 0) + i.amount);
+  const total = Object.values(totals).reduce((a, v) => a + v, 0);
+
+  document.getElementById('incomeSources').innerHTML = `
+    ${Object.entries(totals).map(([cat, val]) => `
+    <div class="income-source-card">
+      <div class="income-cat"><span class="dot cat-dot-${cat}" style="display:inline-block;margin-right:5px;background:${incomeColors[cat]}"></span>${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
+      <div class="income-amount">${val.toFixed(3)} <span style="font-size:14px;color:var(--muted)">KWD</span></div>
+    </div>`).join('')}
+    <div class="income-source-card" style="border-color:var(--accent);">
+      <div class="income-cat" style="color:var(--accent);">Total Earnings</div>
+      <div class="income-amount" style="color:var(--accent)">${total.toFixed(3)} <span style="font-size:14px;color:var(--muted)">KWD</span></div>
+    </div>`;
+}
+
+function renderIncomeHistory() {
+  const incomes = (DB.get('income') || []).slice().reverse();
+  const body = document.getElementById('incomeHistBody');
+  if (!incomes.length) { body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px;">No income logged yet</td></tr>'; return; }
+  body.innerHTML = incomes.map(i => `
+    <tr>
+      <td>${formatDate(i.date)}</td>
+      <td><span class="dot" style="background:${incomeColors[i.source]};display:inline-block;margin-right:6px;"></span>${i.source}</td>
+      <td style="color:var(--muted)">${i.description || '—'}</td>
+      <td style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:18px;">${i.amount.toFixed(3)}</td>
+    </tr>`).join('');
+}
+
+function initIncomeCharts() {
+  const incomes = DB.get('income') || [];
+  const months = Array.from({length:6}, (_, i) => { const d = new Date(); d.setMonth(d.getMonth() - (5 - i)); return d; });
+  const monthData = months.map(m => incomes.filter(i => { const d = new Date(i.date); return d.getMonth() === m.getMonth() && d.getFullYear() === m.getFullYear(); }).reduce((a, i) => a + i.amount, 0));
+  const monthLabels = months.map(m => MONTHS[m.getMonth()]);
+
+  const catTotals = { sponsors: 0, coaching: 0, business: 0, other: 0 };
+  incomes.forEach(i => catTotals[i.source] += i.amount);
+
+  if (incomeMonthChart) incomeMonthChart.destroy();
+  incomeMonthChart = new Chart(document.getElementById('incomeMonthChart'), {
+    type: 'bar',
+    data: { labels: monthLabels, datasets: [{ data: monthData, backgroundColor: 'rgba(200,240,60,.2)', borderColor: '#C8F03C', borderWidth: 1.5, borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  if (incomeCatChart) incomeCatChart.destroy();
+  incomeCatChart = new Chart(document.getElementById('incomeCatChart'), {
+    type: 'doughnut',
+    data: { labels: Object.keys(catTotals).map(k => k.charAt(0).toUpperCase() + k.slice(1)), datasets: [{ data: Object.values(catTotals), backgroundColor: Object.keys(catTotals).map(k => incomeColors[k] + '80'), borderColor: Object.keys(catTotals).map(k => incomeColors[k]), borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 16, font: { size: 10 } } } }, cutout: '60%' }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 5: TOURNAMENTS
+// ═══════════════════════════════════════════════════════
+let editingTournId = null;
+
+function openTournModal() {
+  editingTournId = null;
+  document.getElementById('tName').value = '';
+  document.getElementById('tLocation').value = '';
+  document.getElementById('tCategory').value = '';
+  document.getElementById('tStart').value = '';
+  document.getElementById('tEnd').value = '';
+  document.getElementById('tReg').value = 'not-started';
+  document.getElementById('tTravel').value = 'not-started';
+  document.getElementById('tHotel').value = 'not-started';
+  document.getElementById('tNotes').value = '';
+  openModal('tournModal');
+}
+
+function saveTournament() {
+  const t = {
+    name: document.getElementById('tName').value || 'Unnamed Tournament',
+    location: document.getElementById('tLocation').value,
+    category: document.getElementById('tCategory').value,
+    start: document.getElementById('tStart').value,
+    end: document.getElementById('tEnd').value,
+    registration: document.getElementById('tReg').value,
+    travel: document.getElementById('tTravel').value,
+    hotel: document.getElementById('tHotel').value,
+    notes: document.getElementById('tNotes').value
+  };
+  if (editingTournId) DB.update('tournaments', editingTournId, t);
+  else DB.push('tournaments', t);
+  closeModal('tournModal');
+  renderTournaments();
+}
+
+function renderTournaments() {
+  const tournaments = DB.get('tournaments') || [];
+  const now = new Date();
+  const upcoming = tournaments.filter(t => !t.start || new Date(t.start) >= now).sort((a, b) => new Date(a.start) - new Date(b.start));
+  const past = tournaments.filter(t => t.start && new Date(t.start) < now).sort((a, b) => new Date(b.start) - new Date(a.start));
+
+  const renderCard = (t) => {
+    const daysUntil = t.start ? Math.ceil((new Date(t.start) - now) / 86400000) : null;
+    const isPast = t.start && new Date(t.start) < now;
+    return `
+    <div class="tournament-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div class="t-name">${t.name}</div>
+          <div class="t-meta">
+            ${t.location ? `<span class="t-meta-item"><span class="icon">📍</span>${t.location}</span>` : ''}
+            ${t.category ? `<span class="t-meta-item"><span class="icon">🏆</span>${t.category}</span>` : ''}
+            ${t.start ? `<span class="t-meta-item"><span class="icon">📅</span>${formatDate(t.start)}${t.end ? ' → ' + formatDate(t.end) : ''}</span>` : ''}
+          </div>
+        </div>
+        ${!isPast && daysUntil !== null ? `<div style="text-align:right;"><div class="countdown">${daysUntil}</div><div class="countdown-label">Days Away</div></div>` : ''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <span class="status-pill status-${t.registration}">Reg: ${t.registration.replace('-',' ')}</span>
+        <span class="status-pill status-${t.travel}">Travel: ${t.travel.replace('-',' ')}</span>
+        <span class="status-pill status-${t.hotel}">Hotel: ${t.hotel.replace('-',' ')}</span>
+      </div>
+      ${t.notes ? `<div style="margin-top:10px;font-size:9px;color:var(--muted);line-height:1.6;">${t.notes}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-ghost" style="font-size:8px;padding:6px 12px;" onclick="editTourn('${t.id}')">Edit</button>
+        <button class="btn btn-danger" style="font-size:8px;padding:6px 12px;" onclick="deleteTourn('${t.id}')">Delete</button>
+      </div>
+    </div>`;
+  };
+
+  document.getElementById('upcomingTournaments').innerHTML = upcoming.length ? upcoming.map(renderCard).join('') :
+    '<div class="empty-state"><div class="icon">🏆</div>No upcoming tournaments. Add one above.</div>';
+  document.getElementById('pastTournaments').innerHTML = past.length ? past.map(renderCard).join('') :
+    '<div class="empty-state"><div class="icon">📋</div>No past tournaments yet.</div>';
+}
+
+function editTourn(id) {
+  const t = (DB.get('tournaments') || []).find(x => x.id === id);
+  if (!t) return;
+  editingTournId = id;
+  document.getElementById('tName').value = t.name;
+  document.getElementById('tLocation').value = t.location || '';
+  document.getElementById('tCategory').value = t.category || '';
+  document.getElementById('tStart').value = t.start || '';
+  document.getElementById('tEnd').value = t.end || '';
+  document.getElementById('tReg').value = t.registration || 'not-started';
+  document.getElementById('tTravel').value = t.travel || 'not-started';
+  document.getElementById('tHotel').value = t.hotel || 'not-started';
+  document.getElementById('tNotes').value = t.notes || '';
+  openModal('tournModal');
+}
+
+function deleteTourn(id) {
+  DB.remove('tournaments', id);
+  renderTournaments();
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 6: MATCH LOG
+// ═══════════════════════════════════════════════════════
+let matchChart;
+
+function openMatchModal() {
+  document.getElementById('mDate').value = today();
+  document.getElementById('mOpponent').value = '';
+  document.getElementById('mScore').value = '';
+  document.getElementById('mWorked').value = '';
+  document.getElementById('mImprove').value = '';
+  document.getElementById('mTactics').value = '';
+  document.getElementById('mMental').value = '';
+  openModal('matchModal');
+}
+
+function saveMatch() {
+  const m = {
+    date: document.getElementById('mDate').value || today(),
+    opponent: document.getElementById('mOpponent').value || 'Unknown',
+    type: document.getElementById('mType').value,
+    result: document.getElementById('mResult').value,
+    score: document.getElementById('mScore').value,
+    worked: document.getElementById('mWorked').value,
+    improve: document.getElementById('mImprove').value,
+    tactics: document.getElementById('mTactics').value,
+    mental: document.getElementById('mMental').value
+  };
+  DB.push('matches', m);
+  closeModal('matchModal');
+  renderMatches();
+}
+
+function renderMatches() {
+  const matches = DB.get('matches') || [];
+  const wins = matches.filter(m => m.result === 'win').length;
+  const losses = matches.length - wins;
+  const pct = matches.length ? Math.round(wins / matches.length * 100) : 0;
+
+  document.getElementById('matchTotal').textContent = matches.length;
+  document.getElementById('matchWins').textContent = wins;
+  document.getElementById('matchLosses').textContent = losses;
+  document.getElementById('matchWinPct').textContent = pct + '%';
+
+  // Chart
+  const last8 = matches.slice(-8);
+  const winData = last8.map((_, i) => last8.slice(0, i + 1).filter(m => m.result === 'win').length);
+  const lossData = last8.map((_, i) => last8.slice(0, i + 1).filter(m => m.result === 'loss').length);
+
+  if (matchChart) matchChart.destroy();
+  matchChart = new Chart(document.getElementById('matchChart'), {
+    type: 'line',
+    data: {
+      labels: last8.map(m => m.opponent.split(' ')[0]),
+      datasets: [
+        { label: 'Wins', data: winData, borderColor: '#C8F03C', backgroundColor: 'rgba(200,240,60,.08)', fill: true, tension: 0.4 },
+        { label: 'Losses', data: lossData, borderColor: '#FF4D1C', backgroundColor: 'rgba(255,77,28,.08)', fill: true, tension: 0.4 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top' } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  const grid = document.getElementById('matchGrid');
+  if (!matches.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🎯</div>No matches logged yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = matches.slice().reverse().map(m => `
+    <div class="match-card ${m.result}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <span class="badge badge-${m.result === 'win' ? 'win' : 'loss'}">${m.result.toUpperCase()}</span>
+          <div class="match-score">${m.score || '—'}</div>
+          <div class="match-opponent">vs. ${m.opponent}</div>
+          <div class="match-meta">${formatDate(m.date)} · ${m.type}</div>
+        </div>
+      </div>
+      ${m.worked ? `<div style="margin-top:10px;"><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Worked Well</div><div style="font-size:9px;color:var(--muted);">${m.worked}</div></div>` : ''}
+      ${m.improve ? `<div style="margin-top:8px;"><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--gym);margin-bottom:3px;">Improve</div><div style="font-size:9px;color:var(--muted);">${m.improve}</div></div>` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 6b: DRILL LIBRARY
+// ═══════════════════════════════════════════════════════
+const drillTypeLabels = { 'squash-solo': 'Squash — Solo', 'squash-match': 'Squash — Match Play', gym: 'Gym', running: 'Running', recovery: 'Recovery', other: 'Other' };
+const drillTypeColors = { 'squash-solo': 'var(--squash)', 'squash-match': 'var(--squash)', gym: 'var(--gym)', running: 'var(--run)', recovery: 'var(--recovery)', other: 'var(--purple)' };
+let editingDrillId = null;
+let activeDrillTag = 'all';
+
+function getDefaultDrills() {
+  return [
+    { type: 'squash-solo', name: 'Solo — Straight Drives Focus', duration: 30, steps: 'Straight drives x5min\nCross-courts x5min\nBoast & drive x5min\nGhosting x10min\nCool down & stretch x5min', notes: 'Focus on keeping the ball tight to the wall.' },
+    { type: 'gym', name: 'Power & Strength — Lower Body', duration: 60, steps: 'Warm up — bike 5min\nPower clean 4x4\nBack squat 4x6\nSplit squat 3x8 each leg\nCore finisher — 3 rounds', notes: '' }
+  ];
+}
+
+function openDrillModal(id) {
+  editingDrillId = id || null;
+  const d = id ? (DB.get('drills') || []).find(x => x.id === id) : null;
+  document.getElementById('drillModalTitle').textContent = id ? 'Edit Session' : 'Save Session';
+  document.getElementById('dName').value = d ? d.name : '';
+  document.getElementById('dType').value = d ? d.type : 'squash-solo';
+  document.getElementById('dDuration').value = d ? d.duration : '';
+  document.getElementById('dSteps').value = d ? d.steps : '';
+  document.getElementById('dNotes').value = d ? d.notes : '';
+  openModal('drillModal');
+}
+
+function saveDrill() {
+  const data = {
+    name: document.getElementById('dName').value || 'Untitled Session',
+    type: document.getElementById('dType').value,
+    duration: parseInt(document.getElementById('dDuration').value) || 0,
+    steps: document.getElementById('dSteps').value,
+    notes: document.getElementById('dNotes').value
+  };
+  if (editingDrillId) DB.update('drills', editingDrillId, data);
+  else DB.push('drills', data);
+  closeModal('drillModal');
+  renderDrills();
+}
+
+function deleteDrill(id) {
+  DB.remove('drills', id);
+  renderDrills();
+}
+
+function addDrillToSchedule(id) {
+  const d = (DB.get('drills') || []).find(x => x.id === id);
+  if (!d) return;
+  const type = ['squash','gym','running','recovery'].includes(d.type.split('-')[0]) ? d.type.split('-')[0] : 'squash';
+  DB.push('sessions', {
+    day: new Date().getDay(),
+    type: type,
+    title: d.name,
+    time: '',
+    duration: d.duration || 60,
+    notes: d.steps
+  });
+  alert(`Added "${d.name}" to today's schedule — check the Training tab.`);
+}
+
+function setDrillTagFilter(tag) {
+  activeDrillTag = tag;
+  renderDrills();
+}
+
+function renderDrills() {
+  if (!DB.get('drills')) DB.set('drills', getDefaultDrills());
+  const drills = DB.get('drills') || [];
+  const search = (document.getElementById('drillSearch')?.value || '').toLowerCase();
+
+  const types = ['all', ...new Set(drills.map(d => d.type))];
+  const filterEl = document.getElementById('drillTagFilter');
+  filterEl.innerHTML = types.map(t => `<button class="tag-filter-btn ${t === activeDrillTag ? 'active' : ''}" onclick="setDrillTagFilter('${t}')">${t === 'all' ? 'All' : drillTypeLabels[t] || t}</button>`).join('');
+
+  const filtered = drills.filter(d =>
+    (activeDrillTag === 'all' || d.type === activeDrillTag) &&
+    (!search || d.name.toLowerCase().includes(search) || (d.steps || '').toLowerCase().includes(search))
+  );
+
+  const grid = document.getElementById('drillGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📋</div>No saved sessions yet. Save your first routine!</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(d => `
+    <div class="drill-card">
+      <div>
+        <div class="drill-meta"><span style="color:${drillTypeColors[d.type] || 'var(--muted)'}">${drillTypeLabels[d.type] || d.type}</span>${d.duration ? ' · ' + d.duration + ' min' : ''}</div>
+        <div class="drill-name" style="margin-top:6px;">${d.name}</div>
+      </div>
+      ${d.steps ? `<ol class="drill-steps">${d.steps.split('\n').filter(s => s.trim()).map(s => `<li>${s}</li>`).join('')}</ol>` : ''}
+      ${d.notes ? `<div class="drill-notes">${d.notes}</div>` : ''}
+      <div class="drill-actions">
+        <button class="btn btn-primary" onclick="addDrillToSchedule('${d.id}')">Add to Today</button>
+        <button class="btn btn-ghost" onclick="openDrillModal('${d.id}')">Edit</button>
+        <button class="btn btn-danger" onclick="deleteDrill('${d.id}')">Del</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 7: JOURNAL
+// ═══════════════════════════════════════════════════════
+const journalTemplates = {
+  free: { label: 'Free Write', title: '', body: '' },
+  daily: {
+    label: 'Daily Reflection',
+    title: 'Daily Reflection',
+    body: 'How did today go overall?\n\n\nWhat went well?\n\n\nWhat could have gone better?\n\n\nHow do I feel physically?\n\n\nHow do I feel mentally?\n\n'
+  },
+  training: {
+    label: 'Training Day',
+    title: 'Training Day',
+    body: 'What did I train today?\n\n\nHow did my body feel during the session?\n\n\nWhat felt sharp / what felt off?\n\n\nOne thing to carry into tomorrow\'s session:\n\n'
+  },
+  match: {
+    label: 'Match Day',
+    title: 'Match Day',
+    body: 'Opponent & result:\n\n\nWhat worked tactically?\n\n\nWhat didn\'t work?\n\n\nHow was my mental state during the match?\n\n\nWhat will I adjust next time?\n\n'
+  },
+  gratitude: {
+    label: 'Gratitude',
+    title: 'Gratitude',
+    body: 'Three things I\'m grateful for today:\n1. \n2. \n3. \n\nSomething I\'m proud of:\n\n'
+  },
+  goals: {
+    label: 'Goal Setting',
+    title: 'Goal Setting',
+    body: 'This week I want to focus on:\n\n\nWhy this matters to me:\n\n\nWhat could get in the way, and how will I handle it?\n\n'
+  },
+  morning: {
+    label: 'Morning Pages',
+    title: 'Morning Pages',
+    body: ''
+  }
+};
+let activeJournalTemplate = 'free';
+
+function applyTemplate(key) {
+  activeJournalTemplate = key;
+  const t = journalTemplates[key];
+  document.querySelectorAll('.template-chip').forEach(c => c.classList.toggle('active', c.dataset.key === key));
+  document.getElementById('activeTemplateLabel').textContent = t.label;
+  if (!document.getElementById('jTitle').value) document.getElementById('jTitle').value = t.title;
+  if (!document.getElementById('jContent').value) document.getElementById('jContent').value = t.body;
+  document.getElementById('jContent').focus();
+}
+
+function renderTemplateRow() {
+  document.getElementById('templateRow').innerHTML = Object.entries(journalTemplates).map(([key, t]) =>
+    `<button class="template-chip ${key === activeJournalTemplate ? 'active' : ''}" data-key="${key}" onclick="applyTemplate('${key}')">${t.label}</button>`
+  ).join('');
+}
+
+function resetJournalEditor() {
+  document.getElementById('jDate').value = today();
+  document.getElementById('jTitle').value = '';
+  document.getElementById('jContent').value = '';
+  document.getElementById('jEnergy').value = 7; document.getElementById('jEnergyVal').textContent = 7;
+  document.getElementById('jMotivation').value = 7; document.getElementById('jMotivationVal').textContent = 7;
+  document.getElementById('jRecovery').value = 7; document.getElementById('jRecoveryVal').textContent = 7;
+  document.getElementById('jSleep').value = 7; document.getElementById('jSleepVal').textContent = 7;
+  activeJournalTemplate = 'free';
+  renderTemplateRow();
+  document.getElementById('activeTemplateLabel').textContent = 'Free Write';
+}
+
+function saveJournal() {
+  const content = document.getElementById('jContent').value;
+  if (!content.trim() && !document.getElementById('jTitle').value.trim()) {
+    return alert('Write something before saving — even a line or two.');
+  }
+  const entry = {
+    date: document.getElementById('jDate').value || today(),
+    title: document.getElementById('jTitle').value || 'Untitled Entry',
+    template: journalTemplates[activeJournalTemplate].label,
+    content: content,
+    energy: parseInt(document.getElementById('jEnergy').value),
+    motivation: parseInt(document.getElementById('jMotivation').value),
+    recovery: parseInt(document.getElementById('jRecovery').value),
+    sleep: parseInt(document.getElementById('jSleep').value)
+  };
+  DB.push('journal', entry);
+  resetJournalEditor();
+  renderJournal();
+}
+
+function renderJournal() {
+  const entries = DB.get('journal') || [];
+  const search = (document.getElementById('journalSearch')?.value || '').toLowerCase();
+  const filtered = entries.filter(e =>
+    !search || [e.title, e.content, e.date, e.template].some(s => (s || '').toLowerCase().includes(search))
+  ).slice().reverse();
+
+  const grid = document.getElementById('journalGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📓</div>No journal entries yet. Start writing above!</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(e => `
+    <div class="journal-entry" onclick="viewJournalEntry('${e.id}')">
+      <div class="journal-date">${formatDate(e.date)}</div>
+      <div class="journal-entry-title">${e.title || 'Untitled Entry'}</div>
+      <div class="journal-preview">${e.content || 'No text recorded.'}</div>
+      ${e.template ? `<div class="journal-tmpl-chip">${e.template}</div>` : ''}
+    </div>`).join('');
+}
+
+function viewJournalEntry(id) {
+  const e = (DB.get('journal') || []).find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('jvDate').textContent = formatDate(e.date);
+  document.getElementById('jvTitle').textContent = e.title || 'Untitled Entry';
+  document.getElementById('jvContent').textContent = e.content || 'No text recorded.';
+  const ratingPips = (val) => Array.from({length:10}, (_, i) => `<span class="rating-pip ${i < (val||0) ? 'filled' : ''}"></span>`).join('');
+  document.getElementById('jvEnergy').innerHTML = ratingPips(e.energy);
+  document.getElementById('jvMotivation').innerHTML = ratingPips(e.motivation);
+  document.getElementById('jvRecovery').innerHTML = ratingPips(e.recovery);
+  document.getElementById('jvSleep').innerHTML = ratingPips(e.sleep);
+  document.getElementById('jvDeleteBtn').onclick = () => {
+    if (confirm('Delete this journal entry?')) {
+      DB.remove('journal', id);
+      closeModal('journalViewModal');
+      renderJournal();
+    }
+  };
+  openModal('journalViewModal');
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB 8: ANALYTICS
+// ═══════════════════════════════════════════════════════
+let aRunChart, aHydChart, aIncomeChart, aTrainChart;
+
+function initAnalyticsCharts() {
+  const runs = DB.get('runs') || [];
+  const sessions = DB.get('sessions') || [];
+  const matches = DB.get('matches') || [];
+  const incomes = DB.get('income') || [];
+
+  const weekRunKm = runs.filter(r => { const d = new Date(r.date), now = new Date(); return (now - d) / 864e5 <= 7; }).reduce((a, r) => a + r.distance, 0);
+  const monthRunKm = runs.filter(r => { const d = new Date(r.date), now = new Date(); return (now - d) / 864e5 <= 30; }).reduce((a, r) => a + r.distance, 0);
+  const squashCount = sessions.filter(s => s.type === 'squash').length;
+  const gymCount = sessions.filter(s => s.type === 'gym').length;
+  const avgHyd = (() => { let tot = 0, c = 0; for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); const v = DB.get('hyd_' + d.toISOString().split('T')[0]) || 0; tot += v; if (v > 0) c++; } return c ? Math.round(tot / c) : 0; })();
+  const totalHours = sessions.reduce((a, s) => a + (parseInt(s.duration) || 60), 0) / 60;
+  const wins = matches.filter(m => m.result === 'win').length;
+  const winStreak = (() => { let s = 0; for (const m of [...matches].reverse()) { if (m.result === 'win') s++; else break; } return s; })();
+
+  const kpis = [
+    { icon: '🏃', val: weekRunKm.toFixed(1), unit: 'km', label: 'Weekly Run Vol.', trend: '↑', dir: 'up' },
+    { icon: '📅', val: monthRunKm.toFixed(1), unit: 'km', label: 'Monthly Run Vol.', trend: '', dir: '' },
+    { icon: '🎾', val: squashCount, unit: '', label: 'Squash Sessions', trend: '', dir: '' },
+    { icon: '🏋️', val: gymCount, unit: '', label: 'Gym Sessions', trend: '', dir: '' },
+    { icon: '💧', val: avgHyd, unit: 'ml', label: 'Avg Daily Hydration', trend: avgHyd >= 3500 ? '✓ Goal Hit' : '↓ Below Goal', dir: avgHyd >= 3500 ? 'up' : 'down' },
+    { icon: '⏱', val: totalHours.toFixed(1), unit: 'h', label: 'Total Training Hours', trend: '', dir: '' },
+    { icon: '🏆', val: wins, unit: '', label: 'Total Match Wins', trend: '', dir: '' },
+    { icon: '🔥', val: winStreak, unit: '', label: 'Current Win Streak', trend: winStreak > 0 ? '🔥' : '', dir: winStreak > 0 ? 'up' : '' },
+  ];
+
+  document.getElementById('analyticsKPI').innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-val">${k.val}<span class="kpi-unit">${k.unit}</span></div>
+      <div class="kpi-label">${k.label}</div>
+      ${k.trend ? `<div class="kpi-trend ${k.dir}">${k.trend}</div>` : ''}
+    </div>`).join('');
+
+  // Charts — last 8 weeks
+  const last8Weeks = Array.from({length:8}, (_, i) => {
+    const start = new Date(); start.setDate(start.getDate() - (7 - i) * 7 - start.getDay());
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    return { label: 'W' + (i + 1), start, end };
+  });
+
+  const runData = last8Weeks.map(w => runs.filter(r => { const d = new Date(r.date); return d >= w.start && d <= w.end; }).reduce((a, r) => a + r.distance, 0));
+  const hydData = last8Weeks.map(w => { let tot = 0, c = 0; for (let d = new Date(w.start); d <= w.end; d.setDate(d.getDate() + 1)) { const v = DB.get('hyd_' + d.toISOString().split('T')[0]) || 0; tot += v; if (v) c++; } return c ? Math.round(tot / c) : 0; });
+  const incomeData = last8Weeks.map(w => incomes.filter(i => { const d = new Date(i.date); return d >= w.start && d <= w.end; }).reduce((a, i) => a + i.amount, 0));
+  const trainData = last8Weeks.map(w => {
+    const dayCount = Math.ceil((w.end - w.start) / 864e5) + 1;
+    return Math.min(7, dayCount);
+  });
+
+  const weekLabels = last8Weeks.map(w => w.label);
+
+  if (aRunChart) aRunChart.destroy();
+  aRunChart = new Chart(document.getElementById('aRunChart'), {
+    type: 'bar',
+    data: { labels: weekLabels, datasets: [{ data: runData, backgroundColor: 'rgba(60,180,255,.22)', borderColor: '#3CB4FF', borderWidth: 1.5, borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  if (aHydChart) aHydChart.destroy();
+  aHydChart = new Chart(document.getElementById('aHydChart'), {
+    type: 'line',
+    data: { labels: weekLabels, datasets: [{ data: hydData, borderColor: '#3CB4FF', backgroundColor: 'rgba(60,180,255,.07)', fill: true, tension: 0.4, pointRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  if (aIncomeChart) aIncomeChart.destroy();
+  aIncomeChart = new Chart(document.getElementById('aIncomeChart'), {
+    type: 'line',
+    data: { labels: weekLabels, datasets: [{ data: incomeData, borderColor: '#C8F03C', backgroundColor: 'rgba(200,240,60,.08)', fill: true, tension: 0.4, pointRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  if (aTrainChart) aTrainChart.destroy();
+  aTrainChart = new Chart(document.getElementById('aTrainChart'), {
+    type: 'bar',
+    data: {
+      labels: weekLabels,
+      datasets: [
+        { label: 'Squash', data: last8Weeks.map(() => sessions.filter(s => s.type === 'squash').length), backgroundColor: 'rgba(200,240,60,.25)', borderColor: '#C8F03C', borderWidth: 1.5, borderRadius: 2 },
+        { label: 'Gym', data: last8Weeks.map(() => sessions.filter(s => s.type === 'gym').length), backgroundColor: 'rgba(255,77,28,.2)', borderColor: '#FF4D1C', borderWidth: 1.5, borderRadius: 2 },
+        { label: 'Running', data: last8Weeks.map(() => sessions.filter(s => s.type === 'running').length), backgroundColor: 'rgba(60,180,255,.2)', borderColor: '#3CB4FF', borderWidth: 1.5, borderRadius: 2 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════════════
+function exportCSV() {
+  const activeTab = document.querySelector('.nav-tab.active')?.textContent.trim().toLowerCase();
+  let data = [], filename = 'export.csv', headers = [];
+
+  if (activeTab === 'running') {
+    data = DB.get('runs') || [];
+    headers = ['date','type','distance','pace','hr','rpe'];
+    filename = 'running_log.csv';
+  } else if (activeTab === 'income') {
+    data = DB.get('income') || [];
+    headers = ['date','source','description','amount'];
+    filename = 'income_log.csv';
+  } else if (activeTab === 'matches') {
+    data = DB.get('matches') || [];
+    headers = ['date','opponent','type','result','score','worked','improve','tactics','mental'];
+    filename = 'match_log.csv';
+  } else if (activeTab === 'journal') {
+    data = DB.get('journal') || [];
+    headers = ['date','title','template','content','energy','motivation','recovery','sleep'];
+    filename = 'journal_log.csv';
+  } else if (activeTab === 'nutrition') {
+    data = DB.get('meals') || [];
+    headers = ['date','mealType','name','cals','protein','carbs','fat'];
+    filename = 'nutrition_log.csv';
+  } else if (activeTab === 'drills') {
+    data = DB.get('drills') || [];
+    headers = ['type','name','duration','steps','notes'];
+    filename = 'drill_library.csv';
+  } else if (activeTab === 'tournaments') {
+    data = DB.get('tournaments') || [];
+    headers = ['name','location','category','start','end','registration','travel','hotel','notes'];
+    filename = 'tournaments.csv';
+  } else {
+    alert('Switch to a specific tab to export its data (Running, Nutrition, Income, Matches, Drills, Journal, or Tournaments).');
+    return;
+  }
+
+  if (!data.length) { alert('No data to export.'); return; }
+  const rows = [headers.join(','), ...data.map(row => headers.map(h => '"' + (row[h] || '') + '"').join(','))];
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initSchedule();
+  initRunning();
+  initHydration();
+  initNutrition();
+  renderRecipes();
+  renderTournaments();
+  renderMatches();
+  renderDrills();
+  document.getElementById('jDate').value = today();
+  renderTemplateRow();
+  renderJournal();
+  document.getElementById('incomeDate').value = today();
+});
+</script>
+</body>
+</html>
